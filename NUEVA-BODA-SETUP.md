@@ -9,8 +9,28 @@
 ## 0. Flujo de arranque — quién hace qué, y en qué orden
 
 > Esta sección resume el flujo real de trabajo entre el humano y Claude Code para arrancar una boda nueva, en el orden correcto. El resto del documento (§1 en adelante) es el detalle técnico de cada paso; esta sección es el "orden de la receta".
->
-> **Atajo**: hay una skill global instalada (`~/.agents/skills/nueva-boda/`, symlink en `~/.claude/skills/nueva-boda`) que sigue este mismo orden de preguntas automáticamente. En vez de pegar este documento a mano, basta con invocar `/nueva-boda` desde Claude Code en la carpeta del proyecto nuevo.
+
+### Atajo: la skill `/nueva-boda`
+
+Todo el flujo de este §0 (preguntas + construcción + qué queda pendiente) está encapsulado en una **skill global de Claude Code**, instalada en `~/.agents/skills/nueva-boda/SKILL.md` (symlink en `~/.claude/skills/nueva-boda`, visible desde cualquier proyecto en este ordenador, no solo desde este repo).
+
+**Cómo usarla la próxima vez**:
+1. Completa primero los pasos 1–3 de "Antes de pedir nada a Claude Code" (abajo): repo en GitHub con este `.md`, proyecto de Vercel importado, Google Sheet creado y compartido.
+2. Abre esa carpeta en VS Code con Claude Code, y escribe simplemente `/nueva-boda`.
+3. La skill sigue este mismo orden de preguntas automáticamente: primero **qué tema/plantilla visual usar** (ver "Temas de diseño" más abajo — hasta ahora solo existe **Mint**, el de este proyecto), luego si tiene que ser multiidioma, y por último los datos de la boda (nombres, fecha, lugar, timeline, autobús, contactos, credenciales del panel, dominio, fotos).
+4. No hace falta pegarle este documento a mano ni repetirle el proceso por chat: la skill ya sabe leer el `NUEVA-BODA-SETUP.md` del proyecto plantilla que elijáis para sacar el detalle técnico.
+
+Si la skill no aparece disponible (por ejemplo, en otro ordenador), se puede seguir el mismo resultado pegando este documento completo en el chat y pidiendo a Claude Code que lo siga desde el principio — es exactamente lo que la skill automatiza.
+
+### Temas de diseño (paleta + distribución)
+
+Cada línea de diseño (colores + layout + tipografías) tiene un nombre propio, para poder tener varias plantillas distintas conviviendo y elegir cuál usar en cada boda nueva. Se registra con la línea **`Tema de diseño: <nombre>`** en el `CONTEXTO.md` de cada proyecto, para que la skill `/nueva-boda` pueda encontrarlas.
+
+| Tema | Proyecto de referencia | Descripción |
+|---|---|---|
+| **Mint** | `boda-isabel-marcos` (origen) y `boda-evaristo-marine` (con i18n añadido) | Paleta "hojas" (dorado + verdes eucalipto/salvia sobre fondos marfil/crema, ver §6), tipografías Dancing Script/Playfair Display/Lato, layout de landing de una sola página con parallax, timeline vertical y panel `/dashboard` |
+
+Cuando se cree un tema nuevo (otra paleta/otra distribución), añadir una fila aquí con su nombre y su proyecto de referencia, para que quede localizable.
 
 ### Antes de pedir nada a Claude Code (lo hace el humano)
 
@@ -171,8 +191,10 @@ Las tipografías se cargan por `@import url(...)` en `src/styles/global.css` des
 - `public/favicon.ico`
 - `public/img/*` → ornamentos/patrones florales usados puntualmente
 
-### Diseño (opcional — el sistema ya es reutilizable tal cual)
-Toda la paleta vive en **una única fuente de verdad**: `src/styles/global.css` (`:root`). El `dashboard.astro` importa este mismo fichero, así que cambiar un color ahí lo cambia en toda la web y en el panel a la vez.
+### Diseño — tema **Mint** (opcional cambiarlo — el sistema ya es reutilizable tal cual)
+Esta paleta + distribución es el tema **Mint** (ver tabla de "Temas de diseño" en §0). Toda la paleta vive en **una única fuente de verdad**: `src/styles/global.css` (`:root`). El `dashboard.astro` importa este mismo fichero, así que cambiar un color ahí lo cambia en toda la web y en el panel a la vez.
+
+Si una boda nueva quiere un tema distinto (otra paleta, otra distribución de secciones), no hace falta forzarlo dentro de Mint: se puede crear un tema nuevo con su propio nombre, documentarlo en la tabla de §0 y usar ese proyecto como referencia en adelante — la skill `/nueva-boda` pregunta qué tema usar precisamente por esto.
 
 ```css
 /* src/styles/global.css — paleta actual ("hojas") */

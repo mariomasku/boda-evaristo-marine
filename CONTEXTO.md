@@ -11,6 +11,7 @@ Web de boda para **Marine y Evaristo**, celebrada el **viernes 2 de octubre de 2
 
 La web es **multiidioma (español/francés)** con selector de bandera y detección automática del idioma del navegador — ver §3.
 
+- **Tema de diseño**: Mint (paleta "hojas" + distribución de landing de una sola página — ver tabla de temas en `NUEVA-BODA-SETUP.md` §0)
 - **URL de producción**: https://boda-evaristo-marine.vercel.app (sin dominio propio de momento)
 - **Repositorio**: https://github.com/mariomasku/boda-evaristo-marine
 - **Hosting**: Vercel (proyecto `boda-evaristo-marine`, cuenta mariomascu.recursos@gmail.com)
