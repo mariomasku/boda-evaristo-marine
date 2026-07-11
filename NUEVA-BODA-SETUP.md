@@ -6,6 +6,29 @@
 
 ---
 
+## 0. Flujo de arranque — quién hace qué, y en qué orden
+
+> Esta sección resume el flujo real de trabajo entre el humano y Claude Code para arrancar una boda nueva, en el orden correcto. El resto del documento (§1 en adelante) es el detalle técnico de cada paso; esta sección es el "orden de la receta".
+
+### Antes de pedir nada a Claude Code (lo hace el humano)
+
+1. **Crear el repositorio en GitHub** y subir este mismo fichero (`NUEVA-BODA-SETUP.md`) como único contenido inicial. Pegarlo como texto plano (crear fichero nuevo en GitHub y pegar el contenido, o arrastrar un `.md` real) — evitar subir un Word exportado a `.md`: llega como binario disfrazado de texto y hay que convertirlo a mano.
+2. **Crear el proyecto en Vercel importando ese repo** desde el dashboard de Vercel (*Add New → Project → Import Git Repository*). Esto deja el webhook de auto-deploy ya conectado desde el principio. El primer deploy fallará porque el repo solo tiene el `.md` (no hay app todavía) — es normal, se arregla solo en cuanto Claude Code haga el primer push con el proyecto real.
+3. **Crear el Google Sheet** de esta boda (vacío, cualquier nombre) y compartirlo con `boda-rsvp@invibodas-masku.iam.gserviceaccount.com` como Editor (ver §3.4). Este paso no bloquea el siguiente: se puede hacer en paralelo o incluso después.
+
+### Pedir a Claude Code que construya el proyecto
+
+4. Con este repo abierto en VS Code, pedirle a Claude Code que lea `NUEVA-BODA-SETUP.md` y construya el proyecto siguiendo la plantilla. Responder a sus preguntas: primero si la web debe ser **multiidioma** y en qué idiomas (§7 — pregunta obligatoria, decidirlo aquí y no después), y luego los datos de la boda (nombres, fecha, lugar, autobús, teléfonos, credenciales del panel, dominio, fotos — ver §6). Claude Code duplicará el proyecto plantilla más reciente, personalizará el contenido, probará el build en local y hará el primer push.
+
+### Terminar de configurar (después de que el proyecto ya esté construido y pusheado)
+
+5. Pasarle a Claude Code el **Sheet ID** (de la URL del Sheet creado en el paso 3) para que configure `GOOGLE_SHEET_ID` en Vercel y en `.env.local`.
+6. Autorizar a Claude Code a reutilizar `GOOGLE_SERVICE_ACCOUNT_KEY` desde el proyecto de la boda anterior (es la misma cuenta de servicio para todas las bodas, no hay que crear nada nuevo en Google Cloud), o pasárselo directamente.
+7. Pedir una **prueba real del RSVP**: enviar una confirmación de prueba, comprobar que aparece en el Sheet y en `/dashboard`, y que se borre la fila de prueba antes de entregar.
+8. Revisar antes de entregar: credenciales del panel privado, fotos definitivas, dominio (si se compra uno), y el checklist de seguridad (§10).
+
+---
+
 ## 1. Qué es este proyecto
 
 Una web de invitación de boda de una sola página (landing scroll) con:
