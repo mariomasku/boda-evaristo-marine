@@ -1,0 +1,240 @@
+---
+import SectionTitle from './SectionTitle.astro';
+---
+<section id="autobus" class="bus-section">
+  <div class="bus-container">
+    <p class="section-subtitle bus-subtitle gsap-fade">para los de Córdoba</p>
+    <SectionTitle>Autobús</SectionTitle>
+
+    <p class="bus-intro gsap-fade">
+      Ponemos a vuestra disposición un autobús para los invitados de Córdoba.
+      Podéis indicar si lo necesitáis en el formulario de confirmación.
+    </p>
+
+    <div class="bus-ida-wrap">
+      <div class="bus-card bus-card-ida">
+        <div class="bus-direction">IDA</div>
+        <div class="bus-route">Córdoba → Finca El Capricho</div>
+        <div class="bus-direction">SALIDA DESDE CÓRDOBA</div>
+        <div class="bus-time">17:15h</div>
+      </div>
+    </div>
+
+    <p class="bus-vuelta-heading gsap-fade">
+      Hay dos opciones de vuelta para que podáis elegir la que mejor os venga.
+    </p>
+
+    <div class="bus-routes">
+      <div class="bus-card bus-card-vuelta bus-card-vuelta-1">
+        <div class="bus-direction">VUELTA · PRIMER AUTOCAR</div>
+        <div class="bus-route">Finca El Capricho → Córdoba</div>
+        <div class="bus-direction">LLEGADA A CÓRDOBA</div>
+        <div class="bus-time">03:00h</div>
+      </div>
+
+      <div class="bus-card bus-card-vuelta bus-card-vuelta-2">
+        <div class="bus-direction">VUELTA · SEGUNDO AUTOCAR</div>
+        <div class="bus-route">Finca El Capricho → Córdoba</div>
+        <div class="bus-direction">LLEGADA A CÓRDOBA</div>
+        <div class="bus-time">06:00h</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Tarjeta IDA: entra desde arriba
+  gsap.fromTo('.bus-card-ida',
+    { opacity: 0, y: 30 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.bus-ida-wrap',
+        start: 'top 85%',
+        toggleActions: 'play none none reverse',
+      },
+    }
+  );
+
+  // Tarjeta primer autocar de vuelta: entra desde la izquierda
+  gsap.fromTo('.bus-card-vuelta-1',
+    { opacity: 0, x: -50 },
+    {
+      opacity: 1,
+      x: 0,
+      duration: 0.7,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.bus-routes',
+        start: 'top 82%',
+        toggleActions: 'play none none reverse',
+      },
+    }
+  );
+
+  // Tarjeta segundo autocar de vuelta: entra desde la derecha con ligero retardo
+  gsap.fromTo('.bus-card-vuelta-2',
+    { opacity: 0, x: 50 },
+    {
+      opacity: 1,
+      x: 0,
+      duration: 0.7,
+      delay: 0.15,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.bus-routes',
+        start: 'top 82%',
+        toggleActions: 'play none none reverse',
+      },
+    }
+  );
+</script>
+
+<style>
+  .bus-section {
+    padding: 6rem 1.5rem;
+    background: linear-gradient(135deg, var(--marfil) 0%, var(--crema) 50%, var(--crema) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Patrón de fondo sutil */
+  .bus-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237f958b' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .bus-container {
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Colores de título/subtítulo (heredan globales sobre fondo claro) */
+  .bus-subtitle { color: var(--salvia); }
+  .bus-title    { color: var(--eucalipto); }
+  .bus-ornament-star { color: var(--oro); font-size: 1.2rem; }
+
+  /* Icono de bus decorativo */
+  .bus-icon {
+    width: 172px;
+    height: 172px;
+    filter: brightness(0) sepia(1) saturate(0.5) brightness(0.65);
+  }
+
+  .bus-intro {
+    color: var(--eucalipto);
+    font-family: 'Lato', sans-serif;
+    font-size: 0.95rem;
+    text-align: center;
+    line-height: 1.8;
+    max-width: 480px;
+    margin-top: 0.25rem;
+  }
+
+  /* ── Tarjeta de IDA (centrada) ── */
+  .bus-ida-wrap {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 580px;
+    margin-top: 2rem;
+  }
+
+  .bus-ida-wrap .bus-card {
+    flex: 0 1 320px;
+  }
+
+  /* ── Encabezado destacado de vuelta ── */
+  .bus-vuelta-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-style: italic;
+    color: var(--eucalipto);
+    text-align: center;
+    line-height: 1.5;
+    max-width: 520px;
+    margin: 2.5rem auto 0.5rem;
+  }
+
+  /* ── Tarjetas de vuelta ── */
+  .bus-routes {
+    display: flex;
+    align-items: stretch;
+    gap: 1.5rem;
+    margin: 1rem 0 1rem;
+    width: 100%;
+    max-width: 580px;
+    justify-content: center;
+  }
+
+  .bus-card {
+    flex: 1;
+    background: var(--blanco);
+    border: 1px solid color-mix(in srgb, var(--oro) 35%, transparent);
+    border-radius: 8px;
+    box-shadow: 0 4px 18px color-mix(in srgb, var(--sombra) 6%, transparent);
+    padding: 2rem 1.8rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: box-shadow 0.25s, transform 0.25s;
+  }
+
+  .bus-card:hover {
+    box-shadow: 0 8px 26px color-mix(in srgb, var(--sombra) 10%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .bus-direction {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.38em;
+    color: var(--salvia);
+    font-weight: 700;
+  }
+
+  .bus-route {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.98rem;
+    color: var(--eucalipto);
+    line-height: 1.4;
+  }
+
+  .bus-time {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--eucalipto);
+    font-weight: 400;
+    margin-top: 0.3rem;
+    font-style: italic;
+  }
+
+  @media (max-width: 580px) {
+    .bus-routes {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .bus-ida-wrap .bus-card { flex: 1; }
+    .bus-card  { width: 100%; }
+    .bus-vuelta-heading { font-size: 1.15rem; }
+  }
+</style>

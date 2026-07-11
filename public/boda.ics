@@ -1,0 +1,13 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Boda Marine y Evaristo//ES
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Madrid:20261002T190000
+DTEND;TZID=Europe/Madrid:20261003T060000
+SUMMARY:Boda de Marine y Evaristo
+LOCATION:Finca El Capricho, Alcolea, Córdoba, España
+DESCRIPTION:Ceremonia a las 19:00h\nCóctel a las 20:00h\nCena a las 21:30h\nPrimer autocar a las 03:00h · Segundo autocar a las 06:00h
+URL:https://maps.app.goo.gl/AXdcVG4tCo7STsLf6
+END:VEVENT
+END:VCALENDAR

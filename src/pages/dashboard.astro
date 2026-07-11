@@ -1,0 +1,672 @@
+---
+export const prerender = true;
+import '../styles/global.css';
+---
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard · Marine & Evaristo</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Colores heredados de global.css. Solo tokens propios del panel: */
+      --border:     color-mix(in srgb, var(--oro) 28%, transparent);
+      --text-soft:  color-mix(in srgb, var(--sombra) 55%, transparent);
+      --card-shadow: 0 1px 3px color-mix(in srgb, var(--sombra) 6%, transparent), 0 4px 12px color-mix(in srgb, var(--sombra) 4%, transparent);
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--marfil);
+      min-height: 100vh;
+      color: var(--eucalipto);
+    }
+
+    /* ── Header ── */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--eucalipto);
+      border-bottom: 2px solid var(--oro);
+    }
+    .dash-logo-wrap { display: flex; flex-direction: column; gap: 2px; }
+    .dash-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--oro);
+    }
+    .dash-logo-sub {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--oro) 50%, transparent);
+    }
+    .dash-actions { display: flex; gap: 0.6rem; align-items: center; }
+    .btn-ghost {
+      padding: 0.4rem 0.9rem;
+      border: 1px solid color-mix(in srgb, var(--oro) 35%, transparent);
+      background: transparent;
+      color: color-mix(in srgb, var(--oro) 70%, transparent);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { background: color-mix(in srgb, var(--oro) 12%, transparent); color: var(--oro); }
+    .btn-back-full  { display: inline; }
+    .btn-back-short { display: none; }
+
+    /* ── Main ── */
+    .dash-main { max-width: 880px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+    .dash-page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--eucalipto);
+      margin-bottom: 0.2rem;
+    }
+    .dash-page-sub {
+      font-size: 0.68rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+    }
+
+    #dash-loading, #dash-error {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-soft);
+      font-size: 0.9rem;
+    }
+    #dash-error { color: #b91c1c; }
+
+    /* ── Section ── */
+    .dash-section { margin-bottom: 2.5rem; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .section-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--salvia);
+      font-weight: 700;
+    }
+    .section-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── Stat cards (asistencia) ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.9rem;
+    }
+    .stat-card {
+      background: var(--blanco);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--oro);
+      border-radius: 6px;
+      box-shadow: var(--card-shadow);
+      padding: 1.2rem 0.9rem 1rem;
+      text-align: center;
+      width: 100%;
+      font-family: inherit;
+      cursor: pointer;
+      transition: box-shadow 0.15s, transform 0.1s;
+    }
+    .stat-card:hover {
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--sombra) 12%, transparent);
+      transform: translateY(-2px);
+    }
+    .stat-card:active { transform: translateY(0); }
+    .stat-card:disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
+    .stat-card:disabled:hover { box-shadow: var(--card-shadow); transform: none; }
+    .stat-card-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 0.5rem;
+    }
+    .stat-card-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      color: var(--eucalipto);
+      line-height: 1;
+    }
+    .stat-card-value.muted { color: color-mix(in srgb, var(--sombra) 30%, transparent); }
+    .stat-card-value.gold  { color: var(--salvia); }
+
+    /* ── Bus: compacto ── */
+    .bus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .bus-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: var(--blanco);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--oro);
+      border-radius: 6px;
+      box-shadow: var(--card-shadow);
+      padding: 0.8rem 1.1rem;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      cursor: pointer;
+      transition: box-shadow 0.15s, transform 0.1s;
+    }
+    .bus-card:hover {
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--sombra) 12%, transparent);
+      transform: translateY(-2px);
+    }
+    .bus-card:active { transform: translateY(0); }
+    .bus-card:disabled { cursor: default; opacity: 0.6; }
+    .bus-card:disabled:hover { box-shadow: var(--card-shadow); transform: none; }
+    .bus-card-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .bus-card-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--salvia);
+      font-weight: 700;
+    }
+    .bus-card-hora { font-size: 0.68rem; color: var(--text-soft); line-height: 1.4; }
+    .bus-card-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--eucalipto);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* ── Filas-tarjeta (intolerancias / bebidas): mismo estilo que bus-card ── */
+    .card-list { display: flex; flex-direction: column; gap: 0.9rem; }
+    .row-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: var(--blanco);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--oro);
+      border-radius: 6px;
+      box-shadow: var(--card-shadow);
+      padding: 0.8rem 1.1rem;
+    }
+    .row-card-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+    .row-card-name {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--salvia);
+      font-weight: 700;
+    }
+    .row-mini-bar  { height: 3px; background: color-mix(in srgb, var(--oro) 15%, transparent); border-radius: 2px; margin-top: 5px; max-width: 260px; }
+    .row-mini-fill { height: 100%; background: var(--oro); border-radius: 2px; transition: width 0.6s ease; }
+
+    .row-card-count {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--eucalipto);
+      line-height: 1;
+      flex-shrink: 0;
+      text-align: center;
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+    .row-card-count.zero { color: color-mix(in srgb, var(--sombra) 22%, transparent); }
+    /* Botón redondo: personas con intolerancia */
+    button.row-card-count {
+      cursor: pointer;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--salvia);
+      background: var(--blanco);
+      border: 1.5px solid var(--oro);
+      box-shadow: 0 2px 6px color-mix(in srgb, var(--sombra) 14%, transparent), 0 1px 2px color-mix(in srgb, var(--sombra) 10%, transparent);
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    button.row-card-count:hover {
+      background: color-mix(in srgb, var(--oro) 15%, transparent);
+      box-shadow: 0 4px 10px color-mix(in srgb, var(--sombra) 18%, transparent);
+      transform: translateY(-1px);
+    }
+    button.row-card-count:active { transform: translateY(0); box-shadow: 0 1px 3px color-mix(in srgb, var(--sombra) 12%, transparent); }
+
+    /* ── Enlace al Sheet ── */
+    .sheet-link-wrap { text-align: center; margin-top: 2.5rem; }
+    .sheet-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.8rem 1.6rem;
+      background: var(--eucalipto);
+      color: var(--oro);
+      border: 1px solid var(--eucalipto);
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: var(--card-shadow);
+    }
+    .sheet-link:hover { background: var(--eucalipto-medio); color: var(--marfil); }
+
+    .dash-updated { font-size: 0.65rem; color: var(--text-soft); text-align: center; margin-top: 1rem; letter-spacing: 0.05em; }
+
+    /* ── Modal de personas ── */
+    .people-overlay {
+      position: fixed;
+      inset: 0;
+      background: color-mix(in srgb, var(--eucalipto-noche) 55%, transparent);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 1rem;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .people-overlay.open { opacity: 1; }
+    .people-modal {
+      background: var(--blanco);
+      border-radius: 8px;
+      border-top: 4px solid var(--oro);
+      box-shadow: 0 20px 60px color-mix(in srgb, var(--sombra) 30%, transparent);
+      max-width: 380px;
+      width: 100%;
+      max-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(10px);
+      transition: transform 0.22s ease;
+    }
+    .people-overlay.open .people-modal { transform: translateY(0); }
+    .people-modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.25rem 1.25rem 0.75rem;
+    }
+    .people-modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--eucalipto);
+      line-height: 1.3;
+    }
+    .people-modal-count {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-top: 3px;
+    }
+    .people-close {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-soft);
+      padding: 0.25rem;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .people-close:hover { color: var(--eucalipto); }
+    .people-list {
+      overflow-y: auto;
+      padding: 0.25rem 1.25rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .people-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      padding: 0.6rem 0.85rem;
+      background: color-mix(in srgb, var(--oro) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--oro) 20%, transparent);
+      border-radius: 5px;
+      font-size: 0.82rem;
+      color: var(--eucalipto);
+    }
+    .people-nino {
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--sombra) 40%, transparent);
+      flex-shrink: 0;
+    }
+    .people-empty {
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 0.82rem;
+      padding: 1rem 0.5rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 580px) {
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+      .bus-grid   { grid-template-columns: 1fr; }
+      #logout-btn { display: none; }
+      .btn-back-full  { display: none; }
+      .btn-back-short { display: inline; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="dash-header">
+    <div class="dash-logo-wrap">
+      <span class="dash-logo">Marine <span style="font-style:normal;color:color-mix(in srgb, var(--oro) 50%, transparent)">&</span> Evaristo</span>
+      <span class="dash-logo-sub">Panel de confirmaciones</span>
+    </div>
+    <div class="dash-actions">
+      <a href="/" class="btn-ghost">
+        <span class="btn-back-full">← Sitio web</span>
+        <span class="btn-back-short">Volver</span>
+      </a>
+      <button class="btn-ghost" id="logout-btn">Salir</button>
+    </div>
+  </header>
+
+  <main class="dash-main">
+    <h1 class="dash-page-title">Resumen de la boda</h1>
+    <p class="dash-page-sub">02 · 10 · 2026 · Finca El Capricho · Alcolea, Córdoba</p>
+
+    <div id="dash-loading">Cargando datos…</div>
+    <div id="dash-error" style="display:none"></div>
+    <div id="dash-content" style="display:none">
+
+      <!-- Asistencia -->
+      <div class="dash-section">
+        <div class="section-header">
+          <span class="section-label">Asistencia</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="cards-grid">
+          <button type="button" class="stat-card" data-cat="confirmados">
+            <p class="stat-card-label">Confirmados</p>
+            <p class="stat-card-value gold" id="s-total">—</p>
+          </button>
+          <button type="button" class="stat-card" data-cat="noasisten">
+            <p class="stat-card-label">No asisten</p>
+            <p class="stat-card-value muted" id="s-no">—</p>
+          </button>
+          <button type="button" class="stat-card" data-cat="adultos">
+            <p class="stat-card-label">Adultos</p>
+            <p class="stat-card-value" id="s-adultos">—</p>
+          </button>
+          <button type="button" class="stat-card" data-cat="ninos">
+            <p class="stat-card-label">Niños</p>
+            <p class="stat-card-value" id="s-ninos">—</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Autobús -->
+      <div class="dash-section">
+        <div class="section-header">
+          <span class="section-label">Autocar</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="bus-grid">
+          <button type="button" class="bus-card" data-bus="ida">
+            <div class="bus-card-info">
+              <span class="bus-card-label">Plazas IDA</span>
+              <span class="bus-card-hora">17:15h · Córdoba → Finca</span>
+            </div>
+            <span class="bus-card-value" id="s-bus-ida">—</span>
+          </button>
+          <button type="button" class="bus-card" data-bus="vuelta">
+            <div class="bus-card-info">
+              <span class="bus-card-label">Plazas VUELTA</span>
+              <span class="bus-card-hora">03:00h / 06:00h · Finca → Córdoba</span>
+            </div>
+            <span class="bus-card-value" id="s-bus-vuelta">—</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Intolerancias -->
+      <div class="dash-section">
+        <div class="section-header">
+          <span class="section-label">Intolerancias y alergias</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="card-list" id="intol-list"></div>
+      </div>
+
+      <!-- Bebidas -->
+      <div class="dash-section">
+        <div class="section-header">
+          <span class="section-label">Bebida preferida</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="card-list" id="bebida-list"></div>
+      </div>
+
+      <!-- Acceso al documento completo -->
+      <div class="sheet-link-wrap">
+        <a class="sheet-link" id="sheet-link" href="#" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="1" width="12" height="14" rx="1.5"/>
+            <path d="M5 5h6M5 8h6M5 11h6"/>
+          </svg>
+          Ver documento completo
+        </a>
+        <p class="dash-updated" id="dash-updated"></p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: personas por alérgeno -->
+  <div class="people-overlay" id="people-overlay" role="dialog" aria-modal="true">
+    <div class="people-modal">
+      <div class="people-modal-header">
+        <div>
+          <p class="people-modal-title" id="people-title"></p>
+          <p class="people-modal-count" id="people-count"></p>
+        </div>
+        <button class="people-close" id="people-close" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
+        </button>
+      </div>
+      <div class="people-list" id="people-list"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── Auth guard ──────────────────────────────────────────────
+    if (sessionStorage.getItem('boda_auth') !== 'boda021026') {
+      window.location.replace('/');
+    }
+
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+      sessionStorage.removeItem('boda_auth');
+      window.location.href = '/';
+    });
+
+    // ── Modal de personas ───────────────────────────────────────
+    const peopleOverlay = document.getElementById('people-overlay') as HTMLElement;
+
+    type Persona = { nombre: string; nino: boolean; edad?: string; tag?: string };
+
+    function openPeopleModal(titulo: string, personas: Persona[], opts: { showAge?: boolean } = {}) {
+      document.getElementById('people-title')!.textContent = titulo;
+      document.getElementById('people-count')!.textContent =
+        personas.length === 1 ? '1 persona' : `${personas.length} personas`;
+      document.getElementById('people-list')!.innerHTML = personas.length
+        ? personas.map(p => {
+            let tag = '';
+            if (p.tag) {
+              tag = `<span class="people-nino">${p.tag}</span>`;
+            } else if (opts.showAge && p.nino) {
+              tag = `<span class="people-nino">${p.edad ? p.edad + ' años' : 'niño/a'}</span>`;
+            } else if (p.nino) {
+              tag = '<span class="people-nino">niño/a</span>';
+            }
+            return `<div class="people-item">${p.nombre}${tag}</div>`;
+          }).join('')
+        : '<div class="people-empty">Sin registros todavía</div>';
+      peopleOverlay.style.display = 'flex';
+      peopleOverlay.getBoundingClientRect();
+      peopleOverlay.classList.add('open');
+    }
+
+    function closePeopleModal() {
+      peopleOverlay.classList.remove('open');
+      peopleOverlay.addEventListener('transitionend', () => {
+        peopleOverlay.style.display = 'none';
+      }, { once: true });
+    }
+
+    document.getElementById('people-close')?.addEventListener('click', closePeopleModal);
+    peopleOverlay.addEventListener('click', (e) => { if (e.target === peopleOverlay) closePeopleModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePeopleModal(); });
+
+    // ── Fetch y render ──────────────────────────────────────────
+    let statsData: any = null;
+
+    async function loadStats() {
+      try {
+        const res  = await fetch('/api/stats');
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error ?? 'Error desconocido');
+        statsData = data;
+        render(data);
+      } catch (err) {
+        document.getElementById('dash-loading')!.style.display = 'none';
+        const errEl = document.getElementById('dash-error')!;
+        errEl.style.display = 'block';
+        errEl.textContent = 'No se pudieron cargar los datos: ' + (err instanceof Error ? err.message : String(err));
+      }
+    }
+
+    function set(id: string, val: number | string) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = String(val);
+    }
+
+    function render(data: any) {
+      document.getElementById('dash-loading')!.style.display = 'none';
+      document.getElementById('dash-content')!.style.display = 'block';
+
+      set('s-total',      data.asistencia.total);
+      set('s-adultos',    data.asistencia.adultos);
+      set('s-ninos',      data.asistencia.ninos);
+      set('s-no',         data.asistencia.noAsisten);
+      set('s-bus-ida',    data.autobus.ida);
+      set('s-bus-vuelta', data.autobus.vuelta);
+
+      // Tarjetas de asistencia → modal con la lista de personas de cada categoría
+      const asis = data.asistencia;
+      const catMap: Record<string, { titulo: string; lista: Persona[]; showAge?: boolean }> = {
+        confirmados: { titulo: 'Confirmados', lista: asis.listaConfirmados ?? [] },
+        adultos:     { titulo: 'Adultos',     lista: asis.listaAdultos ?? [] },
+        ninos:       { titulo: 'Niños',       lista: asis.listaNinos ?? [], showAge: true },
+        noasisten:   { titulo: 'No asisten',  lista: asis.listaNoAsisten ?? [] },
+      };
+      document.querySelectorAll<HTMLButtonElement>('.stat-card[data-cat]').forEach(card => {
+        const cfg = catMap[card.dataset.cat!];
+        if (!cfg) return;
+        card.disabled = cfg.lista.length === 0;
+        card.onclick = () => openPeopleModal(cfg.titulo, cfg.lista, { showAge: cfg.showAge });
+      });
+
+      // Tarjetas de autobús → modal con los invitados y sus plazas
+      const busMap: Record<string, { titulo: string; lista: Persona[] }> = {
+        ida:    { titulo: 'Plazas IDA · 17:15h',    lista: data.autobus.listaIda ?? [] },
+        vuelta: { titulo: 'Plazas VUELTA',          lista: data.autobus.listaVuelta ?? [] },
+      };
+      document.querySelectorAll<HTMLButtonElement>('.bus-card[data-bus]').forEach(card => {
+        const cfg = busMap[card.dataset.bus!];
+        if (!cfg) return;
+        card.disabled = cfg.lista.length === 0;
+        card.onclick = () => openPeopleModal(cfg.titulo, cfg.lista);
+      });
+
+      // Intolerancias: filas-tarjeta; el contador es botón si hay personas
+      const maxIntol = Math.max(1, ...data.intolerancias.map((i: any) => i.count));
+      const intolList = document.getElementById('intol-list')!;
+      intolList.innerHTML = data.intolerancias.map((item: any, idx: number) => {
+        const pct = Math.round((item.count / maxIntol) * 100);
+        const countEl = item.count > 0
+          ? `<button class="row-card-count" data-intol-idx="${idx}" title="Ver personas">${item.count}</button>`
+          : `<span class="row-card-count zero">0</span>`;
+        return `<div class="row-card">
+          <div class="row-card-body">
+            <span class="row-card-name">${item.nombre}</span>
+            <div class="row-mini-bar"><div class="row-mini-fill" style="width:${pct}%"></div></div>
+          </div>
+          ${countEl}
+        </div>`;
+      }).join('');
+
+      intolList.querySelectorAll<HTMLButtonElement>('button[data-intol-idx]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const item = statsData.intolerancias[parseInt(btn.dataset.intolIdx!)];
+          openPeopleModal(item.nombre, item.personas ?? []);
+        });
+      });
+
+      // Bebidas: filas-tarjeta simples
+      const bebList = document.getElementById('bebida-list')!;
+      const maxBeb  = Math.max(1, ...data.bebidas.map((b: any) => b.count));
+      bebList.innerHTML = data.bebidas.map((b: any) => {
+        const pct  = Math.round((b.count / maxBeb) * 100);
+        const zero = b.count === 0 ? ' zero' : '';
+        return `<div class="row-card">
+          <div class="row-card-body">
+            <span class="row-card-name">${b.nombre}</span>
+            <div class="row-mini-bar"><div class="row-mini-fill" style="width:${pct}%"></div></div>
+          </div>
+          <span class="row-card-count${zero}">${b.count}</span>
+        </div>`;
+      }).join('');
+
+      // Enlace al documento
+      if (data.sheetUrl) (document.getElementById('sheet-link') as HTMLAnchorElement).href = data.sheetUrl;
+
+      set('dash-updated', 'Actualizado: ' + new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }));
+    }
+
+    loadStats();
+  </script>
+</body>
+</html>

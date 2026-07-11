@@ -1,0 +1,331 @@
+---
+---
+<section id="hero" class="hero-section">
+  <div class="hero-bg parallax-hero-bg" style="background-image: url('/fotos/Foto01.webp')"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-top">
+    <p class="hero-pre gsap-hero">nos casamos</p>
+
+    <!-- Texto SVG: se dibuja letra a letra con stroke-dashoffset -->
+    <svg
+      class="hero-names-svg"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 1000 130"
+      aria-label="Marine y Evaristo"
+      role="img"
+    >
+      <text
+        id="hero-name-text"
+        x="500"
+        y="100"
+        font-family="Playfair Display, Georgia, serif"
+        font-size="120px"
+        font-weight="400"
+        text-anchor="middle"
+        fill="transparent"
+        stroke="#faf7f2"
+        stroke-width="0.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        letter-spacing="-1"
+      >Marine &amp; Evaristo</text>
+    </svg>
+    <div class="hero-date gsap-hero">
+      <span class="date-line"></span>
+      <span class="date-text">02 · 10 · 2026</span>
+      <span class="date-line"></span>
+    </div>
+    <p class="hero-place gsap-hero">Finca El Capricho · Alcolea, Córdoba</p>
+  </div>
+
+  <div class="hero-countdown-title">
+    <p class="hero-pre gsap-hero">Quedan</p>
+  </div>
+  
+  <div class="countdown gsap-hero" id="countdown">
+      <div class="countdown-item">
+        <span class="countdown-number" id="cd-days">--</span>
+        <span class="countdown-label">días</span>
+      </div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-item">
+        <span class="countdown-number" id="cd-hours">--</span>
+        <span class="countdown-label">horas</span>
+      </div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-item">
+        <span class="countdown-number" id="cd-minutes">--</span>
+        <span class="countdown-label">minutos</span>
+      </div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-item">
+        <span class="countdown-number" id="cd-seconds">--</span>
+        <span class="countdown-label">segundos</span>
+      </div>
+    </div>
+
+  <div class="hero-scroll gsap-hero">
+    <span>Desliza hacia arriba</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<style>
+  .hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: -20% 0;
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--eucalipto-noche) 72%, transparent) 0%,
+      color-mix(in srgb, var(--sombra) 65%, transparent) 50%,
+      color-mix(in srgb, var(--eucalipto-noche) 78%, transparent) 100%
+    );
+  }
+
+  /* Bloque de texto anclado a la parte alta (deja libre el centro) */
+  .hero-top {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    text-align: center;
+    color: var(--marfil);
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .hero-pre {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: var(--oro);
+    letter-spacing: 0.3em;
+    text-transform: lowercase;
+  }
+
+  .hero-names-svg {
+    width: clamp(280px, 85vw, 780px);
+    height: auto;
+    overflow: visible;
+  }
+
+  .hero-date {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .date-line {
+    width: 60px;
+    height: 1px;
+    background: var(--oro);
+  }
+
+  .date-text {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.4em;
+    font-size: clamp(0.85rem, 2vw, 1.1rem);
+    color: var(--oro-claro);
+  }
+
+  .hero-place {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    font-size: clamp(0.8rem, 2vw, 1rem);
+    color: color-mix(in srgb, var(--marfil) 70%, transparent);
+    text-transform: uppercase;
+  }
+
+  /* Contador anclado abajo, ~20% por encima del indicador de scroll */
+
+  
+  .countdown, .hero-countdown-title {
+    position: absolute;
+    bottom: calc(11% + 2rem);
+    left: 0;
+    right: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .hero-countdown-title{
+    bottom: calc(18% + 2rem);
+  }
+
+  .countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 70px;
+  }
+
+  .countdown-number {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 400;
+    color: var(--marfil);
+    line-height: 1;
+  }
+
+  .countdown-label {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--oro);
+    margin-top: 0.3rem;
+  }
+
+  .countdown-sep {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--oro);
+    margin-bottom: 1.2rem;
+    opacity: 0.6;
+  }
+
+  .hero-cta {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.85rem 2.5rem;
+    border: 1px solid var(--oro);
+    color: var(--marfil);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .hero-cta:hover {
+    background: var(--oro);
+    color: var(--eucalipto-oscuro);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: color-mix(in srgb, var(--oro) 70%, transparent);
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    z-index: 1;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--oro), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
+  }
+
+  @media (max-width: 480px) {
+    .countdown-item { min-width: 55px; }
+    .countdown-sep { font-size: 1.5rem; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  // Efecto de escritura SVG: stroke-dashoffset
+  document.fonts.ready.then(() => {
+    const textEl = document.getElementById('hero-name-text') as SVGTextElement | null;
+    if (!textEl) return;
+
+    // Calculamos la longitud real del trazo para un dash preciso
+    const strokeLen = textEl.getComputedTextLength() * 1;
+    textEl.setAttribute('stroke-dasharray', String(strokeLen));
+    textEl.setAttribute('stroke-dashoffset', String(strokeLen));
+
+    gsap.timeline({ delay: 1 })
+      // Fase 1: se dibuja el trazo de los caracteres
+      .to(textEl, {
+        attr: { 'stroke-dashoffset': 0 },
+        duration: 2,
+        ease: 'power1.inOut',
+      })
+      // Fase 2: el relleno aparece y el trazo se desvanece
+      .to(textEl, {
+        attr: {
+          fill: '#faf7f2',
+          'stroke-opacity': 0,
+        },
+        duration: 1,
+        ease: 'power2.out',
+        // Colorear el & de dorado al completar
+        onComplete: () => {
+          textEl.setAttribute('stroke', 'none');
+        },
+      }, '-=0.4');
+  });
+
+  function initCountdown() {
+    const weddingDate = new Date('2026-10-02T19:00:00');
+
+    function update() {
+      const now = new Date();
+      const diff = weddingDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        document.getElementById('countdown')!.innerHTML = '<p style="color:var(--oro);font-size:1.2rem;letter-spacing:0.2em">¡Hoy es el gran día!</p>';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const pad = (n: number) => String(n).padStart(2, '0');
+      document.getElementById('cd-days')!.textContent = String(days);
+      document.getElementById('cd-hours')!.textContent = pad(hours);
+      document.getElementById('cd-minutes')!.textContent = pad(minutes);
+      document.getElementById('cd-seconds')!.textContent = pad(seconds);
+    }
+
+    update();
+    setInterval(update, 1000);
+  }
+
+  initCountdown();
+</script>

@@ -1,0 +1,167 @@
+---
+---
+<section class="welcome-section">
+  <div class="welcome-container">
+    <div class="welcome-ornament gsap-fade">
+      <span>✦</span>
+    </div>
+    <div class="welcome-text">
+      <p>Hay días que merecen ser celebrados por todo lo alto, y este es, sin duda, uno de ellos.</p>
+      <p>Por eso nos hace muchísima ilusión que nos acompañes. Vengas de cerca, de lejos, del norte, del sur o con unas cuantas horas de viaje a tu espalda, lo único que de verdad importa es que estés allí.</p>
+      <p>Queremos reunir a las personas que más queremos para compartir risas, abrazos, algún que otro baile improvisado y, con suerte, muy pocas lágrimas (aunque no prometemos nada).</p>
+      <p class="welcome-closing">Porque ese día no habrá distancias, ni acentos, ni kilómetros: solo gente bonita celebrando lo que nos ha traído hasta aquí… </p>
+      <svg
+        class="amor-svg"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 680 130"
+        aria-label="el amor."
+        role="img"
+        overflow="visible"
+      >
+        <text id="amor-text" x="340" y="98">el amor.</text>
+      </svg>
+    </div>
+    <div class="welcome-ornament gsap-fade">
+      <span>✦</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .welcome-section {
+    padding: 6rem 1.5rem;
+    background: var(--marfil);
+  }
+
+  .welcome-container {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .welcome-ornament {
+    color: var(--oro);
+    font-size: 1.3rem;
+    opacity: 0.7;
+  }
+
+  .welcome-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    text-align: center;
+  }
+
+  .welcome-text p {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.55rem, 2.8vw, 2.1rem);
+    line-height: 1.4;
+    color: var(--eucalipto);
+    font-weight: 300;
+  }
+
+  .welcome-closing {
+    color: var(--eucalipto) !important;
+    font-weight: 600 !important;
+  }
+
+  .amor-svg {
+    height: auto;
+    overflow: visible;
+    color: var(--salvia);
+  }
+
+  #amor-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: 100px;
+    font-weight: 400;
+    font-style: italic;
+    text-anchor: middle;
+    fill: transparent;
+    stroke: currentColor;
+    stroke-width: 0.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Estado inicial antes de que GSAP tome el control */
+  .welcome-text p { opacity: 0; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { SplitText } from 'gsap/SplitText';
+
+  gsap.registerPlugin(ScrollTrigger, SplitText);
+
+  document.fonts.ready.then(() => {
+    // ── Preparar "el amor." (estado inicial + función de dibujo) ──
+    // Se define primero para poder dispararlo al terminar el revelado de texto.
+    const textEl = document.getElementById('amor-text') as SVGTextElement | null;
+    const svgEl  = document.querySelector<SVGElement>('.amor-svg');
+    let drawAmor = () => {};
+
+    if (textEl && svgEl) {
+      const len = textEl.getComputedTextLength() * 1.02;
+      textEl.setAttribute('stroke-dasharray', String(len));
+      textEl.setAttribute('stroke-dashoffset', String(len));
+      const fillColor = getComputedStyle(svgEl).color;
+      let played = false;
+
+      drawAmor = () => {
+        if (played) return;   // solo una vez
+        played = true;
+        gsap.timeline()
+          // Fase 1: se dibuja el trazo letra a letra (dashoffset no está en CSS → attr es seguro)
+          .to(textEl, {
+            attr: { 'stroke-dashoffset': 0 },
+            duration: 2.4,
+            ease: 'power1.inOut',
+          })
+          // Fase 2: fill y strokeOpacity como inline styles (prevalecen sobre el CSS)
+          .to(textEl, {
+            fill: fillColor,
+            strokeOpacity: 0,
+            duration: 0.9,
+            ease: 'power2.out',
+            onComplete: () => { textEl.style.stroke = 'none'; },
+          }, '-=0.5');
+      };
+    }
+
+    // ── Revelado palabra a palabra atado al scroll ──
+    // Todas las palabras de todos los párrafos se animan en UNA sola línea de
+    // tiempo y en orden (revelado estrictamente secuencial). Al completarse el
+    // rango del scroll (onLeave), se dispara el dibujo de "el amor.".
+    const container = document.querySelector<HTMLElement>('.welcome-text');
+    if (container) {
+      const allWords: Element[] = [];
+      gsap.utils.toArray<HTMLElement>('.welcome-text p').forEach((p) => {
+        const split = new SplitText(p, { type: 'words' });
+        gsap.set(p, { opacity: 1 });          // el párrafo es visible…
+        allWords.push(...split.words);        // …y acumulamos sus palabras en orden
+      });
+
+      gsap.set(allWords, { opacity: 0.15 });  // todas empiezan apagadas
+      gsap.to(allWords, {
+        opacity: 1,
+        ease: 'none',
+        stagger: 0.5,        // cada palabra arranca a mitad de la anterior (cascada suave)
+        duration: 1,
+        scrollTrigger: {
+          trigger: container,
+          start: 'top 78%',
+          end: 'bottom 62%',
+          scrub: true,
+          onLeave: drawAmor,     // el texto ha terminado de revelarse → dibuja "el amor."
+        },
+      });
+    }
+
+    ScrollTrigger.refresh();
+  });
+</script>
