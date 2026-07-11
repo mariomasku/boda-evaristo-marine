@@ -2,7 +2,7 @@
 
 > **Propósito de este documento**: es la receta para levantar un proyecto **nuevo** (otra boda) igual que este, desde cero. Se centra en qué hay que conectar: repositorios, cuentas, APIs y servicios externos.
 >
-> Para el detalle técnico y el historial de *esta* boda concreta (Isabel & Marcos), ver [`CONTEXTO.md`](./CONTEXTO.md).
+> Para el detalle técnico y el historial de la boda concreta de este repositorio, ver [`CONTEXTO.md`](./CONTEXTO.md).
 
 ---
 
@@ -16,6 +16,7 @@ Una web de invitación de boda de una sola página (landing scroll) con:
 - Formulario de confirmación (RSVP) que escribe en un Google Sheet
 - Panel privado (`/dashboard`) con estadísticas en vivo para los novios, protegido con contraseña simple
 - Footer con acceso al panel
+- Opcionalmente, **multiidioma con selector de bandera** (ver §7) — hay que decidirlo *antes* de escribir el contenido
 
 No hay backend propio ni base de datos: **Google Sheets hace de base de datos**, vía un endpoint serverless en Vercel.
 
@@ -31,6 +32,8 @@ No hay backend propio ni base de datos: **Google Sheets hace de base de datos**,
 | `gsap` | ^3.15.0 | Animaciones (ScrollTrigger, SplitText, TextPlugin, ScrambleTextPlugin) |
 | `googleapis` | ^173.0.0 | Cliente oficial de Google Sheets API |
 | Node.js | ≥ 22.12.0 (`engines` en package.json) | Runtime |
+
+No hay ninguna librería de i18n en el stack: el sistema multiidioma (§7) es un motor propio en TypeScript vanilla, sin dependencias nuevas.
 
 **Notas de Astro 7**:
 - No existe `output: 'hybrid'` (se eliminó). Solo hace falta añadir el adapter de Vercel.
@@ -77,19 +80,20 @@ El código (`ensureSetup()` en `src/pages/api/rsvp.ts`) crea automáticamente, e
 No hace falta preparar nada dentro del Sheet, solo crearlo vacío y compartirlo.
 
 ### 3.5 Google Fonts — sin cuenta
-Las tipografías se cargan por `@import url(...)` en `src/styles/global.css` desde `fonts.googleapis.com`. No requiere cuenta ni configuración, solo construir bien la URL (ver §7).
+Las tipografías se cargan por `@import url(...)` en `src/styles/global.css` desde `fonts.googleapis.com`. No requiere cuenta ni configuración, solo construir bien la URL (ver §8).
 
 ---
 
 ## 4. Checklist para crear una boda nueva
 
+- [ ] **Idioma(s) de la web** — *pregunta obligatoria antes de escribir contenido*: ¿la web tiene que mostrarse en más de un idioma (p. ej. porque uno de los dos novios no es hispanohablante, o hay invitados internacionales)? Si la respuesta es sí, construir el sistema de i18n desde el arranque (ver §7) en vez de traducir todo el contenido después — es mucho más barato hacerlo bien la primera vez.
 - [ ] **GitHub**: crear repo nuevo (o duplicar este) y clonarlo en local
 - [ ] **Google Sheet**: crear uno vacío, compartirlo con `boda-rsvp@invibodas-masku.iam.gserviceaccount.com` como Editor, copiar el Sheet ID
 - [ ] **Vercel**: crear proyecto nuevo desde ese repo
 - [ ] **Variables de entorno en Vercel** (Settings → Environment Variables): añadir `GOOGLE_SERVICE_ACCOUNT_KEY` y `GOOGLE_SHEET_ID` (ver §5)
 - [ ] **`.env.local`** en local (para `astro dev`): las mismas dos variables, en un fichero que **nunca se commitea** (ya está en `.gitignore`)
 - [ ] **Dominio** (opcional): comprar o apuntar uno en Vercel → Settings → Domains
-- [ ] **Contenido**: sustituir todos los datos de la boda anterior (ver §6 — checklist de personalización)
+- [ ] **Contenido**: sustituir todos los datos de la boda anterior (ver §6 — checklist de personalización), ya en el idioma o idiomas decididos en el primer punto
 - [ ] **Fotos**: sustituir `public/fotos/*.webp` y ajustar referencias en `Hero.astro` / `PhotoParallax` en `index.astro`
 - [ ] **Credenciales del panel privado**: cambiar usuarios/contraseña en `Footer.astro` y `dashboard.astro` (ver §6)
 - [ ] Probar en local (`npx astro dev --background`), enviar un RSVP de prueba y comprobar que aparece en el Sheet y en `/dashboard`
@@ -124,10 +128,10 @@ Las tipografías se cargan por `@import url(...)` en `src/styles/global.css` des
 | Fecha y hora de la boda | `Hero.astro` (`weddingDate` del countdown), `Details.astro`, `Layout.astro`, `Footer.astro`, `RSVP.astro` (mensaje de éxito) |
 | Fecha límite de confirmación | `RSVP.astro` (texto "confirma tu asistencia antes del...") |
 | Lugar de la celebración | `Hero.astro`, `Details.astro` (timeline + mapa embed + `.ics`), `dashboard.astro` |
-| Teléfonos de contacto | `Footer.astro` (novios), `RSVP.astro` (fotógrafo) |
+| Teléfonos de contacto | `Footer.astro` (novios), `RSVP.astro` (fotógrafo, si lo hay) |
 | Horarios/rutas de autobús | `Bus.astro` |
 | Timeline del día (horas de ceremonia, cóctel, cena...) | `Details.astro` |
-| Nombre del fotógrafo y su teléfono | `RSVP.astro` (tarjeta al final del formulario) |
+| Nombre del fotógrafo y su teléfono (si lo hay) | `RSVP.astro` (tarjeta al final del formulario) |
 | Fichero `.ics` del calendario | Se genera dinámicamente en `Details.astro` (script `ICS`), solo hay que cambiar los datos del evento |
 
 ### Credenciales del panel privado (`/dashboard`)
@@ -155,13 +159,58 @@ Toda la paleta vive en **una única fuente de verdad**: `src/styles/global.css` 
 --salvia-invitado / --salvia-acompanante / --salvia-ninos  /* colores de fila en el Google Sheet */
 ```
 
-Si la boda siguiente quiere otra paleta, basta con cambiar los valores hex de estas variables (y, aparte, los colores del Sheet en `src/pages/api/rsvp.ts` — ver nota en §7, porque ahí no se pueden leer variables CSS).
+Si la boda siguiente quiere otra paleta, basta con cambiar los valores hex de estas variables (y, aparte, los colores del Sheet en `src/pages/api/rsvp.ts` — ver nota en §8, porque ahí no se pueden leer variables CSS).
 
 **Tipografías** (import en la primera línea de `global.css`): Dancing Script, Birthstone Bounce, Playfair Display, Lato. (`WindSong` está importada pero sin uso actual — se puede quitar del `@import` si no se necesita, o aprovechar para otra parte del texto).
 
 ---
 
-## 7. Cómo funciona la integración con Google Sheets (resumen técnico)
+## 7. Internacionalización (i18n) — decidir desde el principio
+
+> **Pregunta obligatoria al arrancar un proyecto nuevo**: ¿la web tiene que ser multiidioma? Si sí, seguir este patrón desde el primer commit de contenido, no después.
+>
+> La boda Marine & Evaristo se construyó primero solo en español y se le añadió francés más tarde a petición de los novios. Funcionó bien, pero costó bastante más trabajo que si se hubiera planteado así desde el principio: hubo que revisar componente a componente, incluidos los que generan HTML por JavaScript (formulario RSVP, dashboard, `.ics`). Por eso esta sección existe: para que la próxima vez se pregunte primero y se construya bien de entrada.
+
+### Arquitectura (probada en boda-evaristo-marine, reutilizable tal cual)
+
+Sistema de traducción 100% en cliente, sin librería externa (no el i18n de Astro, no `astro-i18next` — simplifica mucho no tener que generar rutas `/es/` y `/fr/` para una landing de una sola página):
+
+- **`src/i18n/translations.ts`** — diccionario plano `{ es: {...}, fr: {...} }`, organizado por sección/componente (`hero.*`, `details.*`, `bus.*`, `rsvp.*`, `footer.*`, `dashboard.*`...). Para una boda nueva: duplicar el bloque de un idioma como base y traducir al resto de idiomas que hagan falta.
+- **`src/i18n/apply.ts`** — motor de aplicación:
+  - `detectInitialLang()`: mira `localStorage` primero; si no hay preferencia guardada, usa `navigator.language`.
+  - `applyLang(lang)`: recorre el DOM y sustituye texto en `[data-i18n]` (`textContent`), `[data-i18n-html]` (`innerHTML`, para textos con `<strong>`/`<br>` embebido), `[data-i18n-placeholder]`, `[data-i18n-aria]` y `[data-i18n-title]`. Actualiza también `document.title`, la meta description, `document.documentElement.lang`, y guarda la preferencia en `localStorage`.
+  - Dispara un evento `langchange` en `window` para que el contenido generado por JavaScript (ver más abajo) se pueda regenerar en el idioma nuevo sin recargar la página.
+  - `t(lang, key)` y `tn(lang, key, n)` (esta última sustituye un marcador `{n}` — útil para "1 persona" / "2 personas").
+  - Se importa **una única vez, lo antes posible**: en el `<head>` de `Layout.astro` para las páginas que usan `Layout`, y al principio del `<script>` de páginas que no lo usan (como `dashboard.astro`, que monta su propio `<html>`). Importa antes de cualquier otro script para que el idioma correcto ya esté aplicado cuando otros scripts (p. ej. GSAP `SplitText`, que trocea el texto en palabras) lean el contenido del DOM.
+- **`src/components/LanguageSwitcher.astro`** — un par de botones-bandera (`🇪🇸`/`🇫🇷`, o los idiomas que toquen) que llaman a `applyLang(lang)` al hacer clic y marcan el activo con `.lang-flag.active`. Se coloca en la navbar de `index.astro` y en el header de `dashboard.astro`.
+
+### Qué hay que traducir, en la práctica
+
+- **Contenido estático** (la mayoría de la web): añadir `data-i18n="seccion.clave"` al elemento, dejando el texto en el idioma por defecto como valor "de fallback" directamente en el HTML (por si el JS tarda o falla).
+- **Contenido con HTML embebido** (ej. "confirma antes del `<strong>1 de septiembre</strong>`"): usar `data-i18n-html` en vez de `data-i18n`.
+- **Contenido generado por JavaScript** (la parte que más se olvida, y la que más partido saca de plantearlo desde el principio):
+  - Campos dinámicos del RSVP (niños, intolerancias): la función que genera el HTML debe llamar a `t(getCurrentLang(), 'clave')` en vez de escribir strings a pelo, y debe volver a ejecutarse en un listener de `langchange` para que lo ya renderizado también cambie de idioma sin recargar.
+  - El fichero `.ics` generado al vuelo en `Details.astro` (asunto, ubicación, descripción, nombre de fichero).
+  - El **dashboard**: los nombres de alérgenos/bebidas que vienen del Google Sheet a través de `api/stats.ts` **no se traducen en el backend** — el endpoint devuelve una `key` estable (`gluten`, `whisky`, etc.) además del nombre en el idioma original del Sheet, y es `dashboard.astro` quien decide qué texto mostrar según el idioma activo. Así no hay que tocar la hoja de cálculo ni la lógica de negocio para añadir idiomas nuevos.
+  - Mensajes de validación/envío del formulario (botón "Enviando…", mensajes de error) también deben pasar por `t()`.
+- **Lo que NO se traduce**:
+  - Nombres propios de la pareja.
+  - El `value` de los `<input>`/`<select>` del formulario RSVP: debe quedarse fijo en un único idioma (el que use `api/rsvp.ts`/`api/stats.ts` para comparar), sea cual sea el idioma mostrado al invitado — solo se traduce la etiqueta visible (`<span>`), nunca el `value` que se guarda en el Sheet. Esto evita tener que tocar el backend al añadir idiomas.
+  - El lugar de la boda, salvo que tenga un exónimo conocido en el otro idioma (p. ej. Córdoba → Cordoue en francés), que sí merece la pena traducir.
+
+### Checklist rápida al construir la web multiidioma desde el principio
+
+- [ ] Crear `src/i18n/translations.ts` y `src/i18n/apply.ts` calcados de los de boda-evaristo-marine
+- [ ] Crear `src/components/LanguageSwitcher.astro` y añadirlo a la navbar y al header del dashboard
+- [ ] Importar `../i18n/apply` en `Layout.astro` (cuanto antes en el `<head>`) y en el `<script>` de `dashboard.astro`
+- [ ] Ir componente a componente añadiendo `data-i18n`/`data-i18n-html`/`data-i18n-placeholder`/`data-i18n-aria`/`data-i18n-title` según el tipo de contenido
+- [ ] Revisar cada `<script>` que genere HTML dinámicamente (RSVP, Details/ICS, dashboard) y usar `t()`/`tn()` en vez de strings fijos, con su listener de `langchange` para refrescar lo ya renderizado
+- [ ] Añadir una `key` estable en `api/stats.ts` para cualquier lista que muestre nombres traducibles (alérgenos, bebidas...)
+- [ ] Probar con capturas de pantalla en cada idioma, comprobando la consola sin errores, y probar también un cambio de idioma en caliente con el formulario a medio rellenar
+
+---
+
+## 8. Cómo funciona la integración con Google Sheets (resumen técnico)
 
 ### `src/pages/api/rsvp.ts` (POST, escritura)
 - Recibe el JSON del formulario.
@@ -173,14 +222,16 @@ Si la boda siguiente quiere otra paleta, basta con cambiar los valores hex de es
 - `autoResizeColumns()`: ajusta el ancho de columna al contenido tras cada envío.
 - **Importante**: los colores en este fichero están escritos como RGB 0–1 (formato que exige la API de Sheets), no pueden ser `var(--...)`. Hay un helper `rgb('hexsinalmohadilla')` que traduce un hex a ese formato — si cambias la paleta de `global.css`, tienes que replicar el cambio aquí a mano.
 - Fórmulas de `RESUMEN` en español (`;` como separador de argumentos, no `,`) porque el Sheet está en locale español.
+- Los valores que se escriben en el Sheet (asistencia, autobús, etc.) son siempre los `value` fijos del formulario (ver §7 sobre qué no se traduce), independientemente del idioma en que el invitado haya visto la web.
 
 ### `src/pages/api/stats.ts` (GET, lectura, usado por `/dashboard`)
 - Lee `RSVP!A2:M` y calcula en JavaScript (no en fórmulas) las estadísticas: confirmados, adultos, niños, no asisten, plazas de bus ida/vuelta, intolerancias con listado de personas, bebidas.
+- Si la web es multiidioma, cada elemento traducible (alérgenos, bebidas) debe llevar además una `key` estable para que el dashboard la traduzca sin tocar este fichero (ver §7).
 - Devuelve también `sheetUrl` (enlace directo al documento) construido a partir de `GOOGLE_SHEET_ID`.
 
 ---
 
-## 8. Comandos útiles
+## 9. Comandos útiles
 
 ```bash
 # Desarrollo local (modo background, recomendado)
@@ -205,7 +256,7 @@ npx vercel logs <deployment-url> --since 1h
 
 ---
 
-## 9. Seguridad — checklist antes de entregar cada boda
+## 10. Seguridad — checklist antes de entregar cada boda
 
 - [ ] `.env.local` y cualquier fichero con la clave del Service Account están en `.gitignore` (ya lo están: `.env*`)
 - [ ] Nunca imprimir/loguear `private_key` en consola ni en respuestas de la API
@@ -215,7 +266,7 @@ npx vercel logs <deployment-url> --since 1h
 
 ---
 
-## 10. Referencias cruzadas
+## 11. Referencias cruzadas
 
-- Historial técnico y decisiones de *esta* boda (Isabel & Marcos): [`CONTEXTO.md`](./CONTEXTO.md)
+- Historial técnico y decisiones de la boda de este repositorio: [`CONTEXTO.md`](./CONTEXTO.md)
 - Instrucciones de desarrollo del repo: [`CLAUDE.md`](./CLAUDE.md)
