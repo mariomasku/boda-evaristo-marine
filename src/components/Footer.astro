@@ -17,14 +17,14 @@
       </div>
     </div>
 
-    <button class="lock-btn gsap-fade" id="lock-btn" aria-label="Acceso privado novios">
+    <button class="lock-btn gsap-fade" id="lock-btn" aria-label="Acceso privado novios" data-i18n-aria="footer.lockAriaLabel">
       <svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="1" y="7" width="12" height="8" rx="1.5"/>
         <path d="M4 7V5a3 3 0 0 1 6 0v2"/>
       </svg>
     </button>
 
-    <p class="footer-copy gsap-fade">Hecho con amor para el día más especial</p>
+    <p class="footer-copy gsap-fade" data-i18n="footer.copy">Hecho con amor para el día más especial</p>
     <p class="footer-dev gsap-fade">Desarrollo maskudev</p>
   </div>
 </footer>
@@ -32,7 +32,7 @@
 <!-- Modal: display:none garantiza que no sea visible antes de que cargue el JS -->
 <div class="login-overlay" id="login-overlay" style="display:none" role="dialog" aria-modal="true" aria-label="Acceso privado">
   <div class="login-modal">
-    <button class="login-close" id="login-close" aria-label="Cerrar">
+    <button class="login-close" id="login-close" aria-label="Cerrar" data-i18n-aria="footer.closeAriaLabel">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
     </button>
     <div class="login-icon">
@@ -42,22 +42,24 @@
         <circle cx="7" cy="11" r="1" fill="currentColor" stroke="none"/>
       </svg>
     </div>
-    <h2 class="login-title">Acceso privado</h2>
-    <p class="login-sub">Para los novios</p>
+    <h2 class="login-title" data-i18n="footer.loginTitle">Acceso privado</h2>
+    <p class="login-sub" data-i18n="footer.loginSub">Para los novios</p>
     <form class="login-form" id="login-form" autocomplete="off">
       <div class="login-field">
-        <input type="text" id="login-user" name="login-user" placeholder="Usuario" autocomplete="username" autocapitalize="none" spellcheck="false" />
+        <input type="text" id="login-user" name="login-user" placeholder="Usuario" autocomplete="username" autocapitalize="none" spellcheck="false" data-i18n-placeholder="footer.userPlaceholder" />
       </div>
       <div class="login-field">
-        <input type="password" id="login-pass" name="login-pass" placeholder="Contraseña" autocomplete="current-password" />
+        <input type="password" id="login-pass" name="login-pass" placeholder="Contraseña" autocomplete="current-password" data-i18n-placeholder="footer.passPlaceholder" />
       </div>
       <p class="login-error" id="login-error"></p>
-      <button type="submit" class="login-submit">Acceder</button>
+      <button type="submit" class="login-submit" data-i18n="footer.loginSubmit">Acceder</button>
     </form>
   </div>
 </div>
 
 <script>
+  import { t, getCurrentLang } from '../i18n/apply';
+
   const USERS: Record<string, string> = {
     pila:     '021026',
     brandon:  '021026',
@@ -100,7 +102,7 @@
       sessionStorage.setItem('boda_auth', 'boda021026');
       window.location.href = '/dashboard';
     } else {
-      errorEl.textContent = 'Usuario o contraseña incorrectos';
+      errorEl.textContent = t(getCurrentLang(), 'footer.loginError');
       passInput.value = '';
       passInput.focus();
     }

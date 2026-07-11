@@ -4,7 +4,7 @@
   <div class="hero-bg parallax-hero-bg" style="background-image: url('/fotos/Foto01.webp')"></div>
   <div class="hero-overlay"></div>
   <div class="hero-top">
-    <p class="hero-pre gsap-hero">nos casamos</p>
+    <p class="hero-pre gsap-hero" data-i18n="hero.pretitle">nos casamos</p>
 
     <!-- Texto SVG: se dibuja letra a letra con stroke-dashoffset -->
     <svg
@@ -35,37 +35,37 @@
       <span class="date-text">02 · 10 · 2026</span>
       <span class="date-line"></span>
     </div>
-    <p class="hero-place gsap-hero">Finca El Capricho · Alcolea, Córdoba</p>
+    <p class="hero-place gsap-hero" data-i18n="hero.place">Finca El Capricho · Alcolea, Córdoba</p>
   </div>
 
   <div class="hero-countdown-title">
-    <p class="hero-pre gsap-hero">Quedan</p>
+    <p class="hero-pre gsap-hero" data-i18n="hero.countdownTitle">Quedan</p>
   </div>
-  
+
   <div class="countdown gsap-hero" id="countdown">
       <div class="countdown-item">
         <span class="countdown-number" id="cd-days">--</span>
-        <span class="countdown-label">días</span>
+        <span class="countdown-label" data-i18n="hero.days">días</span>
       </div>
       <div class="countdown-sep">:</div>
       <div class="countdown-item">
         <span class="countdown-number" id="cd-hours">--</span>
-        <span class="countdown-label">horas</span>
+        <span class="countdown-label" data-i18n="hero.hours">horas</span>
       </div>
       <div class="countdown-sep">:</div>
       <div class="countdown-item">
         <span class="countdown-number" id="cd-minutes">--</span>
-        <span class="countdown-label">minutos</span>
+        <span class="countdown-label" data-i18n="hero.minutes">minutos</span>
       </div>
       <div class="countdown-sep">:</div>
       <div class="countdown-item">
         <span class="countdown-number" id="cd-seconds">--</span>
-        <span class="countdown-label">segundos</span>
+        <span class="countdown-label" data-i18n="hero.seconds">segundos</span>
       </div>
     </div>
 
   <div class="hero-scroll gsap-hero">
-    <span>Desliza hacia arriba</span>
+    <span data-i18n="hero.scroll">Desliza hacia arriba</span>
     <div class="scroll-line"></div>
   </div>
 </section>
@@ -266,6 +266,7 @@
 
 <script>
   import { gsap } from 'gsap';
+  import { t, getCurrentLang } from '../i18n/apply';
 
   // Efecto de escritura SVG: stroke-dashoffset
   document.fonts.ready.then(() => {
@@ -307,7 +308,7 @@
       const diff = weddingDate.getTime() - now.getTime();
 
       if (diff <= 0) {
-        document.getElementById('countdown')!.innerHTML = '<p style="color:var(--oro);font-size:1.2rem;letter-spacing:0.2em">¡Hoy es el gran día!</p>';
+        document.getElementById('countdown')!.innerHTML = `<p style="color:var(--oro);font-size:1.2rem;letter-spacing:0.2em">${t(getCurrentLang(), 'hero.today')}</p>`;
         return;
       }
 

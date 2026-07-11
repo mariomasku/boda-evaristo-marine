@@ -3,16 +3,16 @@ import SectionTitle from './SectionTitle.astro';
 ---
 <section id="detalles" class="details-section">
   <div class="container">
-    <p class="section-subtitle gsap-fade">la celebración</p>
-    <SectionTitle>El gran día</SectionTitle>
+    <p class="section-subtitle gsap-fade" data-i18n="details.subtitle">la celebración</p>
+    <SectionTitle i18n="details.title">El gran día</SectionTitle>
 
-    <p class="event-date gsap-fade">Viernes · 2 de octubre · 2026</p>
+    <p class="event-date gsap-fade" data-i18n="details.eventDate">Viernes · 2 de octubre · 2026</p>
     <button class="cal-btn gsap-fade" id="cal-btn">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="1" y="3" width="14" height="12" rx="1.5"/>
         <path d="M1 7h14M5 1v4M11 1v4"/>
       </svg>
-      Añadir a mi calendario
+      <span data-i18n="details.calBtn">Añadir a mi calendario</span>
     </button>
 
     <div class="timeline-v">
@@ -26,7 +26,7 @@ import SectionTitle from './SectionTitle.astro';
         </div>
         <div class="tl-right">
           <time class="tl-time">17:15h</time>
-          <p class="tl-label">Salida de autocar<br>Córdoba</p>
+          <p class="tl-label"><span data-i18n="details.tlSalidaLabel">Salida de autocar</span><br><span data-i18n="details.tlSalidaPlace">Córdoba</span></p>
         </div>
       </div>
 
@@ -39,7 +39,7 @@ import SectionTitle from './SectionTitle.astro';
         </div>
         <div class="tl-right">
           <time class="tl-time">19:00h</time>
-          <p class="tl-label">Ceremonia</p>
+          <p class="tl-label" data-i18n="details.tlCeremonia">Ceremonia</p>
           <a
             href="#mapa"
             target="_blank"
@@ -50,7 +50,7 @@ import SectionTitle from './SectionTitle.astro';
               <path d="M8 1a5 5 0 0 1 5 5c0 4-5 9-5 9S3 10 3 6a5 5 0 0 1 5-5z"/>
               <circle cx="8" cy="6" r="2"/>
             </svg>
-            Finca El Capricho
+            <span data-i18n="details.tlCeremoniaLink">Finca El Capricho</span>
           </a>
         </div>
       </div>
@@ -65,7 +65,7 @@ import SectionTitle from './SectionTitle.astro';
         <div class="tl-right">
           
           <time class="tl-time">20:00h</time>
-          <p class="tl-label">Cóctel</p>
+          <p class="tl-label" data-i18n="details.tlCoctel">Cóctel</p>
           
         </div>
       </div>
@@ -79,7 +79,7 @@ import SectionTitle from './SectionTitle.astro';
         </div>
         <div class="tl-right">
           <time class="tl-time">21:30h</time>
-          <p class="tl-label">Cena</p>
+          <p class="tl-label" data-i18n="details.tlCena">Cena</p>
         </div>
       </div>
 
@@ -92,7 +92,7 @@ import SectionTitle from './SectionTitle.astro';
         </div>
         <div class="tl-right">
           <time class="tl-time">03:00h</time>
-          <p class="tl-label">Primer autocar<br>Finca El Capricho · Córdoba</p>
+          <p class="tl-label"><span data-i18n="details.tlPrimerAutocar">Primer autocar</span><br><span data-i18n="details.tlPrimerAutocarPlace">Finca El Capricho · Córdoba</span></p>
         </div>
       </div>
 
@@ -105,7 +105,7 @@ import SectionTitle from './SectionTitle.astro';
         </div>
         <div class="tl-right">
           <time class="tl-time">06:00h</time>
-          <p class="tl-label">Segundo autocar<br>Finca El Capricho · Córdoba</p>
+          <p class="tl-label"><span data-i18n="details.tlSegundoAutocar">Segundo autocar</span><br><span data-i18n="details.tlSegundoAutocarPlace">Finca El Capricho · Córdoba</span></p>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ import SectionTitle from './SectionTitle.astro';
         </div>
         <div class="tl-right">
           <time class="tl-time">06:00h</time>
-          <p class="tl-label">Fin de fiesta</p>
+          <p class="tl-label" data-i18n="details.tlFinFiesta">Fin de fiesta</p>
         </div>
       </div>
 
@@ -127,7 +127,7 @@ import SectionTitle from './SectionTitle.astro';
   </div>
 
   <div class="container" id="mapa">
-    <p class="section-subtitle gsap-fade como-llegar">Cómo llegar</p>
+    <p class="section-subtitle gsap-fade como-llegar" data-i18n="details.comoLlegar">Cómo llegar</p>
     <div class="ornament gsap-fade">
       <span style="color: var(--oro); font-size:1.2rem;">✦</span>
     </div>
@@ -136,16 +136,18 @@ import SectionTitle from './SectionTitle.astro';
   <!-- Mapa -->
   <div class="map-wrapper gsap-fade" >
     <div class="map-label">
-      <span>📍 Finca El Capricho · Alcolea, Córdoba</span>
+      <span data-i18n="details.mapLabel">📍 Finca El Capricho · Alcolea, Córdoba</span>
       <a
         href="https://maps.app.goo.gl/AXdcVG4tCo7STsLf6"
         target="_blank"
         rel="noopener"
         class="map-open-link"
+        data-i18n="details.mapOpenLink"
       >Abrir en Google Maps →</a>
     </div>
     <iframe
       title="Localización de Finca El Capricho"
+      data-i18n-title="details.mapTitle"
       src="https://maps.google.com/maps?q=37.9409249,-4.662873&output=embed&z=15"
       width="100%"
       height="400"
@@ -158,24 +160,31 @@ import SectionTitle from './SectionTitle.astro';
 </section>
 
 <script>
-  const ICS = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Boda Marine y Evaristo//ES',
-    'CALSCALE:GREGORIAN',
-    'BEGIN:VEVENT',
-    'DTSTART;TZID=Europe/Madrid:20261002T190000',
-    'DTEND;TZID=Europe/Madrid:20261003T060000',
-    'SUMMARY:Boda de Marine y Evaristo',
-    'LOCATION:Finca El Capricho\\, Alcolea\\, Córdoba\\, España',
-    'DESCRIPTION:Ceremonia a las 19:00h\\nCóctel a las 20:00h\\nCena a las 21:30h',
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].join('\r\n');
+  import { t, getCurrentLang } from '../i18n/apply';
+
+  function buildIcs(): string {
+    const lang = getCurrentLang();
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Boda Marine y Evaristo//ES',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      'DTSTART;TZID=Europe/Madrid:20261002T190000',
+      'DTEND;TZID=Europe/Madrid:20261003T060000',
+      `SUMMARY:${t(lang, 'details.icsSummary')}`,
+      `LOCATION:${t(lang, 'details.icsLocation').replace(/,/g, '\\,')}`,
+      `DESCRIPTION:${t(lang, 'details.icsDescription')}`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+  }
 
   document.getElementById('cal-btn')?.addEventListener('click', async () => {
-    const blob = new Blob([ICS], { type: 'text/calendar;charset=utf-8' });
-    const file = new File([blob], 'Boda-Marine-y-Evaristo.ics', { type: 'text/calendar' });
+    const lang = getCurrentLang();
+    const filename = t(lang, 'details.icsFilename');
+    const blob = new Blob([buildIcs()], { type: 'text/calendar;charset=utf-8' });
+    const file = new File([blob], filename, { type: 'text/calendar' });
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
@@ -201,7 +210,7 @@ import SectionTitle from './SectionTitle.astro';
     const url = URL.createObjectURL(blob);
     const a   = document.createElement('a');
     a.href     = url;
-    a.download = 'Boda-Marine-y-Evaristo.ics';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

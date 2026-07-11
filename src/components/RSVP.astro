@@ -3,9 +3,9 @@ import SectionTitle from './SectionTitle.astro';
 ---
 <section id="rsvp" class="rsvp-section">
   <div class="rsvp-container">
-    <p class="section-subtitle gsap-fade">confirma tu asistencia</p>
-    <SectionTitle>¿Contamos contigo?</SectionTitle>
-    <p class="rsvp-intro gsap-fade">
+    <p class="section-subtitle gsap-fade" data-i18n="rsvp.subtitle">confirma tu asistencia</p>
+    <SectionTitle i18n="rsvp.title">¿Contamos contigo?</SectionTitle>
+    <p class="rsvp-intro gsap-fade" data-i18n-html="rsvp.introHtml">
       Por favor, confirma tu asistencia antes del <strong><br>1 de septiembre de 2026</strong>.
       <br><br>Si no vienes, también te agradeceremos si nos lo indicas.
     </p>
@@ -17,21 +17,21 @@ import SectionTitle from './SectionTitle.astro';
     >
       <!-- 1. Nombre -->
       <div class="form-group">
-        <label for="nombre">1. Nombre completo y apellidos *</label>
-        <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre completo" />
+        <label for="nombre" data-i18n="rsvp.q1Label">1. Nombre completo y apellidos *</label>
+        <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre completo" data-i18n-placeholder="rsvp.q1Placeholder" />
       </div>
 
       <!-- 2. Asistencia -->
       <div class="form-group">
-        <label>2. ¿Asistirás a nuestra boda? *</label>
+        <label data-i18n="rsvp.q2Label">2. ¿Asistirás a nuestra boda? *</label>
         <div class="radio-group">
           <label class="radio-option">
             <input type="radio" name="asistencia" value="Sí, ¡allí estaré!" required />
-            <span>Sí, ¡allí estaré!</span>
+            <span data-i18n="rsvp.q2Yes">Sí, ¡allí estaré!</span>
           </label>
           <label class="radio-option">
             <input type="radio" name="asistencia" value="No, me lo perderé con todo el dolor de mi corazón" />
-            <span>No, me lo perderé con todo el dolor de mi corazón</span>
+            <span data-i18n="rsvp.q2No">No, me lo perderé con todo el dolor de mi corazón</span>
           </label>
         </div>
       </div>
@@ -41,33 +41,33 @@ import SectionTitle from './SectionTitle.astro';
 
       <!-- 3. Acompañante -->
       <div class="form-group">
-        <label>3. ¿Vienes con acompañante?</label>
+        <label data-i18n="rsvp.q3Label">3. ¿Vienes con acompañante?</label>
         <div class="radio-group" id="acompanante-radios">
           <label class="radio-option">
             <input type="radio" name="acompanante" value="si" id="acomp-si" />
-            <span>Sí</span>
+            <span data-i18n="rsvp.yes">Sí</span>
           </label>
           <label class="radio-option">
             <input type="radio" name="acompanante" value="no" id="acomp-no" />
-            <span>No</span>
+            <span data-i18n="rsvp.no">No</span>
           </label>
         </div>
         <div class="conditional" id="acomp-nombre-block" style="display:none">
-          <input type="text" id="acompanante_nombre" name="acompanante_nombre" placeholder="Nombre completo de tu acompañante" />
+          <input type="text" id="acompanante_nombre" name="acompanante_nombre" placeholder="Nombre completo de tu acompañante" data-i18n-placeholder="rsvp.q3Placeholder" />
         </div>
       </div>
 
       <!-- 4. Niños -->
       <div class="form-group">
-        <label>4. ¿Traes niños?</label>
+        <label data-i18n="rsvp.q4Label">4. ¿Traes niños?</label>
         <div class="radio-group">
           <label class="radio-option">
             <input type="radio" name="ninos" value="si" id="ninos-si" />
-            <span>Sí</span>
+            <span data-i18n="rsvp.yes">Sí</span>
           </label>
           <label class="radio-option">
             <input type="radio" name="ninos" value="no" id="ninos-no" />
-            <span>No</span>
+            <span data-i18n="rsvp.no">No</span>
           </label>
         </div>
       </div>
@@ -75,7 +75,7 @@ import SectionTitle from './SectionTitle.astro';
       <!-- 5. Datos niños (dinámico) -->
       <div id="ninos-block" style="display:none" class="ninos-wrapper">
         <div class="form-group">
-          <label>5. ¿Cuántos niños traes?</label>
+          <label data-i18n="rsvp.q5Label">5. ¿Cuántos niños traes?</label>
           <div class="ninos-count-picker" id="ninos-count-picker">
             <button type="button" class="ninos-count-btn" data-value="1">1</button>
             <button type="button" class="ninos-count-btn" data-value="2">2</button>
@@ -90,98 +90,98 @@ import SectionTitle from './SectionTitle.astro';
 
       <!-- 6. Intolerancias alimentarias -->
       <div class="form-group">
-        <label>6. ¿Algún miembro de tu grupo tiene alguna intolerancia o alergia alimentaria? *</label>
+        <label data-i18n="rsvp.q6Label">6. ¿Algún miembro de tu grupo tiene alguna intolerancia o alergia alimentaria? *</label>
         <div class="radio-group">
           <label class="radio-option">
             <input type="radio" name="tiene_intolerancias" value="no" id="intol-no" />
-            <span>No, ninguno tiene alergias ni intolerancias</span>
+            <span data-i18n="rsvp.q6No">No, ninguno tiene alergias ni intolerancias</span>
           </label>
           <label class="radio-option">
             <input type="radio" name="tiene_intolerancias" value="si" id="intol-si" />
-            <span>Sí, alguien de mi grupo tiene intolerancias o alergias</span>
+            <span data-i18n="rsvp.q6Yes">Sí, alguien de mi grupo tiene intolerancias o alergias</span>
           </label>
         </div>
-        <p class="intol-error" id="intol-error">Por favor, indica si hay o no alergias en tu grupo antes de continuar.</p>
+        <p class="intol-error" id="intol-error" data-i18n="rsvp.q6Error">Por favor, indica si hay o no alergias en tu grupo antes de continuar.</p>
         <div id="intol-personas-wrap" class="intol-personas-wrap">
-          <p class="form-hint" style="margin-bottom:0.5rem">Selecciona cada persona para indicar sus restricciones alimentarias:</p>
+          <p class="form-hint" style="margin-bottom:0.5rem" data-i18n="rsvp.q6Hint">Selecciona cada persona para indicar sus restricciones alimentarias:</p>
           <div id="intol-personas-list" class="intol-personas-list"></div>
         </div>
       </div>
 
       <!-- 7. Bebida -->
       <div class="form-group">
-        <label>7. ¿Qué bebida no puede faltar en la barra libre?</label>
+        <label data-i18n="rsvp.q7Label">7. ¿Qué bebida no puede faltar en la barra libre?</label>
         <div class="checkbox-group">
           <label class="checkbox-option">
             <input type="checkbox" name="bebida" value="Whisky" />
-            <span>Whisky</span>
+            <span data-i18n="rsvp.drinkWhisky">Whisky</span>
           </label>
           <label class="checkbox-option">
             <input type="checkbox" name="bebida" value="Ginebra" />
-            <span>Ginebra</span>
+            <span data-i18n="rsvp.drinkGinebra">Ginebra</span>
           </label>
           <label class="checkbox-option">
             <input type="checkbox" name="bebida" value="Ron" />
-            <span>Ron</span>
+            <span data-i18n="rsvp.drinkRon">Ron</span>
           </label>
           <label class="checkbox-option">
             <input type="checkbox" name="bebida" value="Vodka" />
-            <span>Vodka</span>
+            <span data-i18n="rsvp.drinkVodka">Vodka</span>
           </label>
         </div>
       </div>
 
       <!-- 8. Autobús -->
       <div class="form-group">
-        <label>8. Para los de Córdoba: ¿necesitarás el autobús?</label>
+        <label data-i18n="rsvp.q8Label">8. Para los de Córdoba: ¿necesitarás el autobús?</label>
         <div class="radio-group" id="bus-radios">
           <label class="radio-option">
             <input type="radio" name="autobus" value="Ida y vuelta" id="bus-idavuelta" />
-            <span>Sí, ida y vuelta</span>
+            <span data-i18n="rsvp.q8IdaVuelta">Sí, ida y vuelta</span>
           </label>
           <label class="radio-option">
             <input type="radio" name="autobus" value="Solo ida" />
-            <span>Solo ida</span>
+            <span data-i18n="rsvp.q8SoloIda">Solo ida</span>
           </label>
           <label class="radio-option">
             <input type="radio" name="autobus" value="Solo vuelta" />
-            <span>Solo vuelta</span>
+            <span data-i18n="rsvp.q8SoloVuelta">Solo vuelta</span>
           </label>
           <label class="radio-option">
             <input type="radio" name="autobus" value="No lo necesitaré" id="bus-no" />
-            <span>No lo necesitaré</span>
+            <span data-i18n="rsvp.q8No">No lo necesitaré</span>
           </label>
         </div>
       </div>
 
       <!-- 9. Plazas autobús -->
       <div class="form-group conditional" id="bus-plazas-block" style="display:none">
-        <label>9. ¿Cuántas plazas necesitarías?</label>
+        <label data-i18n="rsvp.q9Label">9. ¿Cuántas plazas necesitarías?</label>
         <div class="ninos-count-picker" id="bus-plazas-picker"></div>
         <input type="hidden" name="bus_plazas" id="bus_plazas" />
       </div>
 
       <!-- 10. Canción -->
       <div class="form-group">
-        <label for="cancion">10. ¿Qué canción no puede faltar en la pista de baile?</label>
-        <input type="text" id="cancion" name="cancion" placeholder="¡Esa que hace que lo des todo!" />
+        <label for="cancion" data-i18n="rsvp.q10Label">10. ¿Qué canción no puede faltar en la pista de baile?</label>
+        <input type="text" id="cancion" name="cancion" placeholder="¡Esa que hace que lo des todo!" data-i18n-placeholder="rsvp.q10Placeholder" />
       </div>
 
       <!-- 11. Comentarios -->
       <div class="form-group">
-        <label for="comentarios">11. ¿Tienes alguna otra duda o comentario?</label>
-        <textarea id="comentarios" name="comentarios" rows="4" placeholder="Cuéntanos..."></textarea>
+        <label for="comentarios" data-i18n="rsvp.q11Label">11. ¿Tienes alguna otra duda o comentario?</label>
+        <textarea id="comentarios" name="comentarios" rows="4" placeholder="Cuéntanos..." data-i18n-placeholder="rsvp.q11Placeholder"></textarea>
         <div class="photo-hint">
           <img src="/icons/fotos.svg" alt="" aria-hidden="true" class="photo-hint-icon" />
-          <p class="photo-hint-text">Si tienes pensado hacernos una sorpresa durante la cena, cuéntanoslo aquí para poder organizarlo con calma.</p>
+          <p class="photo-hint-text" data-i18n="rsvp.photoHint">Si tienes pensado hacernos una sorpresa durante la cena, cuéntanoslo aquí para poder organizarlo con calma.</p>
         </div>
       </div>
 
       </div><!-- /#extras-si -->
 
-      <button type="submit" class="submit-btn">Enviar confirmación</button>
+      <button type="submit" class="submit-btn" data-i18n="rsvp.submit">Enviar confirmación</button>
 
-      <div id="form-error" class="form-message error" style="display:none">
+      <div id="form-error" class="form-message error" style="display:none" data-i18n="rsvp.formError">
         Algo ha ido mal. Por favor, inténtalo de nuevo o escríbenos directamente.
       </div>
     </form>
@@ -197,9 +197,9 @@ import SectionTitle from './SectionTitle.astro';
         <path d="M8 12.5l2.5 2.5L16 9.5"/>
       </svg>
     </div>
-    <h2 class="success-title">¡Gracias!</h2>
-    <p class="success-text">Hemos recibido tu confirmación.<br>¡Nos vemos el 2 de octubre! 🎉</p>
-    <button type="button" class="success-accept" id="success-accept">Aceptar</button>
+    <h2 class="success-title" data-i18n="rsvp.successTitle">¡Gracias!</h2>
+    <p class="success-text" data-i18n-html="rsvp.successTextHtml">Hemos recibido tu confirmación.<br>¡Nos vemos el 2 de octubre! 🎉</p>
+    <button type="button" class="success-accept" id="success-accept" data-i18n="rsvp.successAccept">Aceptar</button>
   </div>
 </div>
 
@@ -755,6 +755,8 @@ import SectionTitle from './SectionTitle.astro';
 </style>
 
 <script>
+  import { t, tn, getCurrentLang } from '../i18n/apply';
+
   // ── Mostrar/ocultar extras según asistencia ──
   const extrasSi = document.getElementById('extras-si')!;
   document.querySelectorAll<HTMLInputElement>('input[name="asistencia"]').forEach((el) => {
@@ -792,18 +794,30 @@ import SectionTitle from './SectionTitle.astro';
   });
 
   // ── Picker de número de niños ──
+  let lastNinosCount = 0;
+
   function buildNinoFields(count: number) {
+    lastNinosCount = count;
+    const lang = getCurrentLang();
+    // Preservar valores ya escritos si se reconstruye (p.ej. cambio de idioma)
+    const prevValues: Record<number, { nombre: string; edad: string }> = {};
+    for (let i = 1; i <= count; i++) {
+      const nEl = document.getElementById(`nino_${i}_nombre`) as HTMLInputElement | null;
+      const eEl = document.querySelector<HTMLInputElement>(`[name="nino_${i}_edad"]`);
+      prevValues[i] = { nombre: nEl?.value ?? '', edad: eEl?.value ?? '' };
+    }
+
     const container = document.getElementById('ninos-names-container')!;
     container.innerHTML = '';
     for (let i = 1; i <= count; i++) {
       const group = document.createElement('div');
       group.className = 'nino-entry';
       group.innerHTML = `
-        <span class="nino-entry-title">Niño/a ${i}</span>
-        <span class="nino-campo-label">Nombre</span>
-        <input type="text" name="nino_${i}_nombre" id="nino_${i}_nombre" placeholder="Nombre completo" required />
-        <span class="nino-campo-label">Edad</span>
-        <input type="number" name="nino_${i}_edad" placeholder="Años (0–17)" min="0" max="17" required />
+        <span class="nino-entry-title">${t(lang, 'rsvp.ninoEntryTitle').replace('{n}', String(i))}</span>
+        <span class="nino-campo-label">${t(lang, 'rsvp.ninoNombreLabel')}</span>
+        <input type="text" name="nino_${i}_nombre" id="nino_${i}_nombre" placeholder="${t(lang, 'rsvp.ninoNombrePlaceholder')}" value="${prevValues[i].nombre}" required />
+        <span class="nino-campo-label">${t(lang, 'rsvp.ninoEdadLabel')}</span>
+        <input type="number" name="nino_${i}_edad" placeholder="${t(lang, 'rsvp.ninoEdadPlaceholder')}" value="${prevValues[i].edad}" min="0" max="17" required />
       `;
       container.appendChild(group);
       document.getElementById(`nino_${i}_nombre`)?.addEventListener('input', refreshIntolList);
@@ -881,50 +895,40 @@ import SectionTitle from './SectionTitle.astro';
   // Q6 — INTOLERANCIAS ALIMENTARIAS
   // ══════════════════════════════════════════
 
-  const INTOL_ITEMS: [string, string][] = [
-    ['GLUTEN',       'Gluten (celiaquía o sensibilidad al gluten)'],
-    ['LACTOSA',      'Lactosa / lácteos'],
-    ['HUEVO',        'Huevo'],
-    ['FRUTOS_SECOS', 'Frutos secos (almendras, nueces, avellanas, etc.)'],
-    ['CACAHUETE',    'Cacahuete'],
-    ['MARISCO',      'Marisco'],
-    ['PESCADO',      'Pescado'],
-    ['SOJA',         'Soja'],
-    ['SESAMO',       'Sésamo'],
-    ['MOSTAZA',      'Mostaza'],
-    ['APIO',         'Apio'],
-    ['SULFITOS',     'Sulfitos (vino, frutos secos tratados, etc.)'],
-    ['ALTRAMUCES',   'Altramuces (lupino)'],
-    ['MOLUSCOS',     'Moluscos (mejillones, almejas, pulpo, calamar, etc.)'],
+  const INTOL_CODES = [
+    'GLUTEN', 'LACTOSA', 'HUEVO', 'FRUTOS_SECOS', 'CACAHUETE', 'MARISCO',
+    'PESCADO', 'SOJA', 'SESAMO', 'MOSTAZA', 'APIO', 'SULFITOS', 'ALTRAMUCES', 'MOLUSCOS',
   ];
 
   function getGroupPersons() {
+    const lang = getCurrentLang();
     const persons: { id: string; nombre: string; badge: string }[] = [];
-    const nombreInv = (document.getElementById('nombre') as HTMLInputElement)?.value?.trim() || 'Tú';
-    persons.push({ id: 'invitado', nombre: nombreInv, badge: 'Invitado/a' });
+    const nombreInv = (document.getElementById('nombre') as HTMLInputElement)?.value?.trim() || t(lang, 'rsvp.defaultTu');
+    persons.push({ id: 'invitado', nombre: nombreInv, badge: t(lang, 'rsvp.badgeInvitado') });
     if ((document.getElementById('acomp-si') as HTMLInputElement)?.checked) {
-      const acN = (document.getElementById('acompanante_nombre') as HTMLInputElement)?.value?.trim() || 'Acompañante';
-      persons.push({ id: 'acompanante', nombre: acN, badge: 'Acompañante' });
+      const acN = (document.getElementById('acompanante_nombre') as HTMLInputElement)?.value?.trim() || t(lang, 'rsvp.defaultAcompanante');
+      persons.push({ id: 'acompanante', nombre: acN, badge: t(lang, 'rsvp.badgeAcompanante') });
     }
     if ((document.getElementById('ninos-si') as HTMLInputElement)?.checked) {
       const cnt = parseInt((document.getElementById('ninos_count') as HTMLSelectElement)?.value) || 0;
       for (let i = 1; i <= cnt; i++) {
-        const nn = (document.getElementById(`nino_${i}_nombre`) as HTMLInputElement)?.value?.trim() || `Niño/a ${i}`;
-        persons.push({ id: `nino_${i}`, nombre: nn, badge: 'Niño/a' });
+        const nn = (document.getElementById(`nino_${i}_nombre`) as HTMLInputElement)?.value?.trim() || t(lang, 'rsvp.defaultNino').replace('{n}', String(i));
+        persons.push({ id: `nino_${i}`, nombre: nn, badge: t(lang, 'rsvp.badgeNino') });
       }
     }
     return persons;
   }
 
   function buildCheckboxGrid(personId: string) {
+    const lang = getCurrentLang();
     return `<div class="intol-checkboxes">
-      ${INTOL_ITEMS.map(([val, label]) =>
-        `<label class="intol-check-label"><input type="checkbox" name="intol_${personId}" value="${val}" />${label}</label>`
+      ${INTOL_CODES.map((code) =>
+        `<label class="intol-check-label"><input type="checkbox" name="intol_${personId}" value="${code}" />${t(lang, `rsvp.intol.${code}`)}</label>`
       ).join('')}
     </div>
     <div class="intol-otros-wrap">
-      <span class="intol-otros-label">Otros:</span>
-      <input type="text" name="intol_${personId}_otros" placeholder="Especifica otros alérgenos..." />
+      <span class="intol-otros-label">${t(lang, 'rsvp.otrosLabel')}</span>
+      <input type="text" name="intol_${personId}_otros" placeholder="${t(lang, 'rsvp.otrosPlaceholder')}" />
     </div>`;
   }
 
@@ -950,7 +954,8 @@ import SectionTitle from './SectionTitle.astro';
     const count = document.querySelectorAll<HTMLInputElement>(`input[name="intol_${personId}"]:checked`).length;
     const badge = document.querySelector<HTMLElement>(`#intol-card-${personId} .intol-count`);
     if (!badge) return;
-    badge.textContent = count > 0 ? `${count} seleccionada${count !== 1 ? 's' : ''}` : '';
+    const lang = getCurrentLang();
+    badge.textContent = count > 0 ? tn(lang, count === 1 ? 'rsvp.selectedOne' : 'rsvp.selectedOther', count) : '';
     badge.classList.toggle('visible', count > 0);
   }
 
@@ -1058,7 +1063,7 @@ import SectionTitle from './SectionTitle.astro';
       return;
     }
 
-    btn.textContent = 'Enviando...';
+    btn.textContent = t(getCurrentLang(), 'rsvp.sending');
     btn.disabled = true;
 
     try {
@@ -1083,7 +1088,7 @@ import SectionTitle from './SectionTitle.astro';
       if (res.ok) {
         resetFormCompleto();
         errorMsg.style.display = 'none';
-        btn.textContent = 'Enviar confirmación';
+        btn.textContent = t(getCurrentLang(), 'rsvp.submit');
         btn.disabled = false;
         openSuccessModal();
       } else {
@@ -1093,8 +1098,16 @@ import SectionTitle from './SectionTitle.astro';
     } catch (err) {
       console.error('RSVP submit error:', err);
       errorMsg.style.display = 'block';
-      btn.textContent = 'Enviar confirmación';
+      btn.textContent = t(getCurrentLang(), 'rsvp.submit');
       btn.disabled = false;
     }
+  });
+
+  // ── Re-renderizar contenido generado por JS al cambiar de idioma ──
+  window.addEventListener('langchange', () => {
+    if ((document.getElementById('ninos-si') as HTMLInputElement)?.checked) {
+      buildNinoFields(lastNinosCount);
+    }
+    refreshIntolList();
   });
 </script>

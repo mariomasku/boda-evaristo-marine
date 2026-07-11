@@ -1,0 +1,47 @@
+---
+---
+<div class="lang-switcher" role="group" aria-label="Selector de idioma / Sélecteur de langue">
+  <button type="button" class="lang-flag" data-lang="es" aria-label="Español" title="Español">🇪🇸</button>
+  <button type="button" class="lang-flag" data-lang="fr" aria-label="Français" title="Français">🇫🇷</button>
+</div>
+
+<style>
+  .lang-switcher {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .lang-flag {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0.3rem 0.4rem;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s, border-color 0.2s, transform 0.15s;
+  }
+
+  .lang-flag:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+  }
+
+  .lang-flag.active {
+    opacity: 1;
+    border-color: color-mix(in srgb, var(--oro) 60%, transparent);
+    background: color-mix(in srgb, var(--oro) 12%, transparent);
+  }
+</style>
+
+<script>
+  import { applyLang, type Lang } from '../i18n/apply';
+
+  document.querySelectorAll<HTMLButtonElement>('.lang-flag').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang as Lang;
+      applyLang(lang);
+    });
+  });
+</script>

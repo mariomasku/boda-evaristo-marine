@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import '../styles/global.css';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 ---
 <!doctype html>
 <html lang="es">
@@ -389,51 +390,52 @@ import '../styles/global.css';
     }
   </style>
 </head>
-<body>
+<body data-title-key="dashboard.title">
 
   <header class="dash-header">
     <div class="dash-logo-wrap">
       <span class="dash-logo">Marine <span style="font-style:normal;color:color-mix(in srgb, var(--oro) 50%, transparent)">&</span> Evaristo</span>
-      <span class="dash-logo-sub">Panel de confirmaciones</span>
+      <span class="dash-logo-sub" data-i18n="dashboard.panelSub">Panel de confirmaciones</span>
     </div>
     <div class="dash-actions">
+      <LanguageSwitcher />
       <a href="/" class="btn-ghost">
-        <span class="btn-back-full">← Sitio web</span>
-        <span class="btn-back-short">Volver</span>
+        <span class="btn-back-full" data-i18n="dashboard.backFull">← Sitio web</span>
+        <span class="btn-back-short" data-i18n="dashboard.backShort">Volver</span>
       </a>
-      <button class="btn-ghost" id="logout-btn">Salir</button>
+      <button class="btn-ghost" id="logout-btn" data-i18n="dashboard.logout">Salir</button>
     </div>
   </header>
 
   <main class="dash-main">
-    <h1 class="dash-page-title">Resumen de la boda</h1>
-    <p class="dash-page-sub">02 · 10 · 2026 · Finca El Capricho · Alcolea, Córdoba</p>
+    <h1 class="dash-page-title" data-i18n="dashboard.pageTitle">Resumen de la boda</h1>
+    <p class="dash-page-sub" data-i18n="dashboard.pageSub">02 · 10 · 2026 · Finca El Capricho · Alcolea, Córdoba</p>
 
-    <div id="dash-loading">Cargando datos…</div>
+    <div id="dash-loading" data-i18n="dashboard.loading">Cargando datos…</div>
     <div id="dash-error" style="display:none"></div>
     <div id="dash-content" style="display:none">
 
       <!-- Asistencia -->
       <div class="dash-section">
         <div class="section-header">
-          <span class="section-label">Asistencia</span>
+          <span class="section-label" data-i18n="dashboard.sectionAsistencia">Asistencia</span>
           <div class="section-line"></div>
         </div>
         <div class="cards-grid">
           <button type="button" class="stat-card" data-cat="confirmados">
-            <p class="stat-card-label">Confirmados</p>
+            <p class="stat-card-label" data-i18n="dashboard.catConfirmados">Confirmados</p>
             <p class="stat-card-value gold" id="s-total">—</p>
           </button>
           <button type="button" class="stat-card" data-cat="noasisten">
-            <p class="stat-card-label">No asisten</p>
+            <p class="stat-card-label" data-i18n="dashboard.catNoAsisten">No asisten</p>
             <p class="stat-card-value muted" id="s-no">—</p>
           </button>
           <button type="button" class="stat-card" data-cat="adultos">
-            <p class="stat-card-label">Adultos</p>
+            <p class="stat-card-label" data-i18n="dashboard.catAdultos">Adultos</p>
             <p class="stat-card-value" id="s-adultos">—</p>
           </button>
           <button type="button" class="stat-card" data-cat="ninos">
-            <p class="stat-card-label">Niños</p>
+            <p class="stat-card-label" data-i18n="dashboard.catNinos">Niños</p>
             <p class="stat-card-value" id="s-ninos">—</p>
           </button>
         </div>
@@ -442,21 +444,21 @@ import '../styles/global.css';
       <!-- Autobús -->
       <div class="dash-section">
         <div class="section-header">
-          <span class="section-label">Autocar</span>
+          <span class="section-label" data-i18n="dashboard.sectionAutocar">Autocar</span>
           <div class="section-line"></div>
         </div>
         <div class="bus-grid">
           <button type="button" class="bus-card" data-bus="ida">
             <div class="bus-card-info">
-              <span class="bus-card-label">Plazas IDA</span>
-              <span class="bus-card-hora">17:15h · Córdoba → Finca</span>
+              <span class="bus-card-label" data-i18n="dashboard.busIdaLabel">Plazas IDA</span>
+              <span class="bus-card-hora" data-i18n="dashboard.busIdaHora">17:15h · Córdoba → Finca</span>
             </div>
             <span class="bus-card-value" id="s-bus-ida">—</span>
           </button>
           <button type="button" class="bus-card" data-bus="vuelta">
             <div class="bus-card-info">
-              <span class="bus-card-label">Plazas VUELTA</span>
-              <span class="bus-card-hora">03:00h / 06:00h · Finca → Córdoba</span>
+              <span class="bus-card-label" data-i18n="dashboard.busVueltaLabel">Plazas VUELTA</span>
+              <span class="bus-card-hora" data-i18n="dashboard.busVueltaHora">03:00h / 06:00h · Finca → Córdoba</span>
             </div>
             <span class="bus-card-value" id="s-bus-vuelta">—</span>
           </button>
@@ -466,7 +468,7 @@ import '../styles/global.css';
       <!-- Intolerancias -->
       <div class="dash-section">
         <div class="section-header">
-          <span class="section-label">Intolerancias y alergias</span>
+          <span class="section-label" data-i18n="dashboard.sectionIntol">Intolerancias y alergias</span>
           <div class="section-line"></div>
         </div>
         <div class="card-list" id="intol-list"></div>
@@ -475,7 +477,7 @@ import '../styles/global.css';
       <!-- Bebidas -->
       <div class="dash-section">
         <div class="section-header">
-          <span class="section-label">Bebida preferida</span>
+          <span class="section-label" data-i18n="dashboard.sectionBebida">Bebida preferida</span>
           <div class="section-line"></div>
         </div>
         <div class="card-list" id="bebida-list"></div>
@@ -488,7 +490,7 @@ import '../styles/global.css';
             <rect x="2" y="1" width="12" height="14" rx="1.5"/>
             <path d="M5 5h6M5 8h6M5 11h6"/>
           </svg>
-          Ver documento completo
+          <span data-i18n="dashboard.seeDocument">Ver documento completo</span>
         </a>
         <p class="dash-updated" id="dash-updated"></p>
       </div>
@@ -503,7 +505,7 @@ import '../styles/global.css';
           <p class="people-modal-title" id="people-title"></p>
           <p class="people-modal-count" id="people-count"></p>
         </div>
-        <button class="people-close" id="people-close" aria-label="Cerrar">
+        <button class="people-close" id="people-close" aria-label="Cerrar" data-i18n-aria="dashboard.peopleCloseAria">
           <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
         </button>
       </div>
@@ -512,6 +514,8 @@ import '../styles/global.css';
   </div>
 
   <script>
+    import { t, tn, getCurrentLang } from '../i18n/apply';
+
     // ── Auth guard ──────────────────────────────────────────────
     if (sessionStorage.getItem('boda_auth') !== 'boda021026') {
       window.location.replace('/');
@@ -525,25 +529,26 @@ import '../styles/global.css';
     // ── Modal de personas ───────────────────────────────────────
     const peopleOverlay = document.getElementById('people-overlay') as HTMLElement;
 
-    type Persona = { nombre: string; nino: boolean; edad?: string; tag?: string };
+    type Persona = { nombre: string; nino: boolean; edad?: string; plazas?: number; tag?: string };
 
     function openPeopleModal(titulo: string, personas: Persona[], opts: { showAge?: boolean } = {}) {
+      const lang = getCurrentLang();
       document.getElementById('people-title')!.textContent = titulo;
       document.getElementById('people-count')!.textContent =
-        personas.length === 1 ? '1 persona' : `${personas.length} personas`;
+        tn(lang, personas.length === 1 ? 'dashboard.personOne' : 'dashboard.personOther', personas.length);
       document.getElementById('people-list')!.innerHTML = personas.length
         ? personas.map(p => {
             let tag = '';
-            if (p.tag) {
-              tag = `<span class="people-nino">${p.tag}</span>`;
+            if (p.plazas !== undefined) {
+              tag = `<span class="people-nino">${tn(lang, p.plazas === 1 ? 'dashboard.plazaOne' : 'dashboard.plazaOther', p.plazas)}</span>`;
             } else if (opts.showAge && p.nino) {
-              tag = `<span class="people-nino">${p.edad ? p.edad + ' años' : 'niño/a'}</span>`;
+              tag = `<span class="people-nino">${p.edad ? p.edad + t(lang, 'dashboard.ageSuffix') : t(lang, 'dashboard.ninoTag')}</span>`;
             } else if (p.nino) {
-              tag = '<span class="people-nino">niño/a</span>';
+              tag = `<span class="people-nino">${t(lang, 'dashboard.ninoTag')}</span>`;
             }
             return `<div class="people-item">${p.nombre}${tag}</div>`;
           }).join('')
-        : '<div class="people-empty">Sin registros todavía</div>';
+        : `<div class="people-empty">${t(lang, 'dashboard.emptyList')}</div>`;
       peopleOverlay.style.display = 'flex';
       peopleOverlay.getBoundingClientRect();
       peopleOverlay.classList.add('open');
@@ -564,17 +569,18 @@ import '../styles/global.css';
     let statsData: any = null;
 
     async function loadStats() {
+      const lang = getCurrentLang();
       try {
         const res  = await fetch('/api/stats');
         const data = await res.json();
-        if (!data.ok) throw new Error(data.error ?? 'Error desconocido');
+        if (!data.ok) throw new Error(data.error ?? t(lang, 'dashboard.unknownError'));
         statsData = data;
         render(data);
       } catch (err) {
         document.getElementById('dash-loading')!.style.display = 'none';
         const errEl = document.getElementById('dash-error')!;
         errEl.style.display = 'block';
-        errEl.textContent = 'No se pudieron cargar los datos: ' + (err instanceof Error ? err.message : String(err));
+        errEl.textContent = t(lang, 'dashboard.loadError') + (err instanceof Error ? err.message : String(err));
       }
     }
 
@@ -584,6 +590,7 @@ import '../styles/global.css';
     }
 
     function render(data: any) {
+      const lang = getCurrentLang();
       document.getElementById('dash-loading')!.style.display = 'none';
       document.getElementById('dash-content')!.style.display = 'block';
 
@@ -597,10 +604,10 @@ import '../styles/global.css';
       // Tarjetas de asistencia → modal con la lista de personas de cada categoría
       const asis = data.asistencia;
       const catMap: Record<string, { titulo: string; lista: Persona[]; showAge?: boolean }> = {
-        confirmados: { titulo: 'Confirmados', lista: asis.listaConfirmados ?? [] },
-        adultos:     { titulo: 'Adultos',     lista: asis.listaAdultos ?? [] },
-        ninos:       { titulo: 'Niños',       lista: asis.listaNinos ?? [], showAge: true },
-        noasisten:   { titulo: 'No asisten',  lista: asis.listaNoAsisten ?? [] },
+        confirmados: { titulo: t(lang, 'dashboard.catConfirmados'), lista: asis.listaConfirmados ?? [] },
+        adultos:     { titulo: t(lang, 'dashboard.catAdultos'),     lista: asis.listaAdultos ?? [] },
+        ninos:       { titulo: t(lang, 'dashboard.catNinos'),       lista: asis.listaNinos ?? [], showAge: true },
+        noasisten:   { titulo: t(lang, 'dashboard.catNoAsisten'),   lista: asis.listaNoAsisten ?? [] },
       };
       document.querySelectorAll<HTMLButtonElement>('.stat-card[data-cat]').forEach(card => {
         const cfg = catMap[card.dataset.cat!];
@@ -611,8 +618,8 @@ import '../styles/global.css';
 
       // Tarjetas de autobús → modal con los invitados y sus plazas
       const busMap: Record<string, { titulo: string; lista: Persona[] }> = {
-        ida:    { titulo: 'Plazas IDA · 17:15h',    lista: data.autobus.listaIda ?? [] },
-        vuelta: { titulo: 'Plazas VUELTA',          lista: data.autobus.listaVuelta ?? [] },
+        ida:    { titulo: t(lang, 'dashboard.busIdaTitle'),    lista: data.autobus.listaIda ?? [] },
+        vuelta: { titulo: t(lang, 'dashboard.busVueltaTitle'), lista: data.autobus.listaVuelta ?? [] },
       };
       document.querySelectorAll<HTMLButtonElement>('.bus-card[data-bus]').forEach(card => {
         const cfg = busMap[card.dataset.bus!];
@@ -622,6 +629,7 @@ import '../styles/global.css';
       });
 
       // Intolerancias: filas-tarjeta; el contador es botón si hay personas
+      const intolNombre = (item: any) => item.key ? t(lang, `dashboard.allergens.${item.key}`) : item.nombre;
       const maxIntol = Math.max(1, ...data.intolerancias.map((i: any) => i.count));
       const intolList = document.getElementById('intol-list')!;
       intolList.innerHTML = data.intolerancias.map((item: any, idx: number) => {
@@ -631,7 +639,7 @@ import '../styles/global.css';
           : `<span class="row-card-count zero">0</span>`;
         return `<div class="row-card">
           <div class="row-card-body">
-            <span class="row-card-name">${item.nombre}</span>
+            <span class="row-card-name">${intolNombre(item)}</span>
             <div class="row-mini-bar"><div class="row-mini-fill" style="width:${pct}%"></div></div>
           </div>
           ${countEl}
@@ -641,11 +649,12 @@ import '../styles/global.css';
       intolList.querySelectorAll<HTMLButtonElement>('button[data-intol-idx]').forEach(btn => {
         btn.addEventListener('click', () => {
           const item = statsData.intolerancias[parseInt(btn.dataset.intolIdx!)];
-          openPeopleModal(item.nombre, item.personas ?? []);
+          openPeopleModal(intolNombre(item), item.personas ?? []);
         });
       });
 
       // Bebidas: filas-tarjeta simples
+      const bebNombre = (b: any) => b.key ? t(lang, `dashboard.drinks.${b.key}`) : b.nombre;
       const bebList = document.getElementById('bebida-list')!;
       const maxBeb  = Math.max(1, ...data.bebidas.map((b: any) => b.count));
       bebList.innerHTML = data.bebidas.map((b: any) => {
@@ -653,7 +662,7 @@ import '../styles/global.css';
         const zero = b.count === 0 ? ' zero' : '';
         return `<div class="row-card">
           <div class="row-card-body">
-            <span class="row-card-name">${b.nombre}</span>
+            <span class="row-card-name">${bebNombre(b)}</span>
             <div class="row-mini-bar"><div class="row-mini-fill" style="width:${pct}%"></div></div>
           </div>
           <span class="row-card-count${zero}">${b.count}</span>
@@ -663,10 +672,16 @@ import '../styles/global.css';
       // Enlace al documento
       if (data.sheetUrl) (document.getElementById('sheet-link') as HTMLAnchorElement).href = data.sheetUrl;
 
-      set('dash-updated', 'Actualizado: ' + new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' }));
+      const localeTag = lang === 'fr' ? 'fr-FR' : 'es-ES';
+      set('dash-updated', t(lang, 'dashboard.updatedPrefix') + new Date().toLocaleString(localeTag, { timeZone: 'Europe/Madrid' }));
     }
 
     loadStats();
+
+    // Al cambiar de idioma, re-renderiza con los datos ya cargados
+    window.addEventListener('langchange', () => {
+      if (statsData) render(statsData);
+    });
   </script>
 </body>
 </html>

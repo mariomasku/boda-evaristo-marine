@@ -3,26 +3,32 @@ import { google } from 'googleapis';
 
 export const prerender = false;
 
-// [token buscado en la celda, etiqueta a mostrar]. El token debe coincidir
-// (sin distinguir mayúsculas) con el nombre limpio que escribe rsvp.ts.
-const ALLERGENS: [string, string][] = [
-  ['Gluten',       'Gluten (celiaquía)'],
-  ['Lactosa',      'Lactosa / lácteos'],
-  ['Huevo',        'Huevo'],
-  ['Frutos secos', 'Frutos secos'],
-  ['Cacahuete',    'Cacahuete'],
-  ['Marisco',      'Marisco'],
-  ['Pescado',      'Pescado'],
-  ['Soja',         'Soja'],
-  ['Sésamo',       'Sésamo'],
-  ['Mostaza',      'Mostaza'],
-  ['Apio',         'Apio'],
-  ['Sulfitos',     'Sulfitos'],
-  ['Altramuces',   'Altramuces (lupino)'],
-  ['Moluscos',     'Moluscos'],
+// [token buscado en la celda, etiqueta a mostrar, key i18n para el dashboard].
+// El token debe coincidir (sin distinguir mayúsculas) con el nombre limpio
+// que escribe rsvp.ts.
+const ALLERGENS: [string, string, string][] = [
+  ['Gluten',       'Gluten (celiaquía)', 'gluten'],
+  ['Lactosa',      'Lactosa / lácteos',  'lactosa'],
+  ['Huevo',        'Huevo',              'huevo'],
+  ['Frutos secos', 'Frutos secos',       'frutos_secos'],
+  ['Cacahuete',    'Cacahuete',          'cacahuete'],
+  ['Marisco',      'Marisco',            'marisco'],
+  ['Pescado',      'Pescado',            'pescado'],
+  ['Soja',         'Soja',               'soja'],
+  ['Sésamo',       'Sésamo',             'sesamo'],
+  ['Mostaza',      'Mostaza',            'mostaza'],
+  ['Apio',         'Apio',               'apio'],
+  ['Sulfitos',     'Sulfitos',           'sulfitos'],
+  ['Altramuces',   'Altramuces (lupino)', 'altramuces'],
+  ['Moluscos',     'Moluscos',           'moluscos'],
 ];
 
-const BEBIDAS = ['Whisky', 'Ginebra', 'Ron', 'Vodka'];
+const BEBIDAS: [string, string][] = [
+  ['Whisky',  'whisky'],
+  ['Ginebra', 'ginebra'],
+  ['Ron',     'ron'],
+  ['Vodka',   'vodka'],
+];
 
 // Normaliza para comparaciones sin distinguir mayúsculas/acentos de caja.
 const U = (v: unknown): string => (v == null ? '' : String(v)).toUpperCase();
@@ -58,10 +64,11 @@ export const GET: APIRoute = async () => {
     const busIda    = sumPlazas(idaRows);
     const busVuelta = sumPlazas(vueltaRows);
 
-    // Persona de autobús: nombre + nº de plazas como etiqueta
+    // Persona de autobús: nombre + nº de plazas (numérico; el dashboard
+    // construye la etiqueta traducida a partir de "plazas").
     const busPersona = (r: string[]) => {
       const p = parseInt(r[10]) || 0;
-      return { nombre: r[1] ?? '', nino: false, tag: p === 1 ? '1 plaza' : `${p} plazas` };
+      return { nombre: r[1] ?? '', nino: false, plazas: p, tag: p === 1 ? '1 plaza' : `${p} plazas` };
     };
 
     const toPersona = (r: string[], extra = '') => ({
@@ -70,18 +77,20 @@ export const GET: APIRoute = async () => {
       edad: r[5] ?? '',
     });
 
-    const intolerancias = ALLERGENS.map(([token, label]) => {
+    const intolerancias = ALLERGENS.map(([token, label, key]) => {
       const afectados = rows.filter(r => has(r[6], token));
       return {
         nombre: label,
+        key,
         count: afectados.length,
         personas: afectados.filter(r => r[1]).map(r => toPersona(r)),
       };
     });
     const otros = rows.filter(r => (r[7] ?? '').trim() !== '');
 
-    const bebidas = BEBIDAS.map(nombre => ({
+    const bebidas = BEBIDAS.map(([nombre, key]) => ({
       nombre,
+      key,
       count: rows.filter(r => has(r[8], nombre)).length,
     }));
 
@@ -104,6 +113,7 @@ export const GET: APIRoute = async () => {
       },
       intolerancias: [...intolerancias, {
         nombre: 'Otros especificados',
+        key: 'otros',
         count: otros.length,
         personas: otros.filter(r => r[1]).map(r => toPersona(r, r[7])),
       }],

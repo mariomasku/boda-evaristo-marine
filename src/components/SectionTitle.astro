@@ -1,5 +1,9 @@
 ---
 // Título de sección con forma de cinta (banner). El estilo está en
 // global.css (.section-title).
+interface Props {
+  i18n?: string;
+}
+const { i18n } = Astro.props;
 ---
-<h2 class="section-title gsap-fade"><slot /></h2>
+<h2 class="section-title gsap-fade" data-i18n={i18n}><slot /></h2>
