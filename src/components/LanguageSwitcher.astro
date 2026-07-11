@@ -12,26 +12,19 @@
   }
 
   .lang-flag {
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 4px;
+    background: none;
+    border: none;
     font-size: 1.1rem;
     line-height: 1;
-    padding: 0.3rem 0.4rem;
+    padding: 0.2rem 0.3rem;
     cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.2s, border-color 0.2s, transform 0.15s;
+    opacity: 0.8;
+    transition: opacity 0.2s, transform 0.15s;
   }
 
   .lang-flag:hover {
-    opacity: 0.85;
-    transform: translateY(-1px);
-  }
-
-  .lang-flag.active {
     opacity: 1;
-    border-color: color-mix(in srgb, var(--oro) 60%, transparent);
-    background: color-mix(in srgb, var(--oro) 12%, transparent);
+    transform: translateY(-1px);
   }
 </style>
 

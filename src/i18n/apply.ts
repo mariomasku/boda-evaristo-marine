@@ -78,8 +78,11 @@ export function applyLang(lang: Lang) {
   const metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute('content', t(lang, 'common.metaDescription'));
 
+  // Solo se muestra la bandera del idioma AL QUE se puede cambiar
+  // (el contrario al activo), nunca la del idioma ya activo.
   document.querySelectorAll<HTMLElement>('.lang-flag').forEach((el) => {
-    el.classList.toggle('active', el.getAttribute('data-lang') === lang);
+    const isCurrent = el.getAttribute('data-lang') === lang;
+    el.style.display = isCurrent ? 'none' : '';
   });
 
   window.dispatchEvent(new CustomEvent('langchange', { detail: { lang } }));

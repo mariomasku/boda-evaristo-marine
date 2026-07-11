@@ -159,12 +159,11 @@
     text-transform: uppercase;
   }
 
-  /* Contador anclado abajo, ~20% por encima del indicador de scroll */
+  /* Contador anclado abajo, con más separación respecto al indicador de scroll */
 
-  
   .countdown, .hero-countdown-title {
     position: absolute;
-    bottom: calc(11% + 2rem);
+    bottom: calc(11% + 3.5rem);
     left: 0;
     right: 0;
     z-index: 1;
@@ -175,14 +174,14 @@
   }
 
   .hero-countdown-title{
-    bottom: calc(18% + 2rem);
+    bottom: calc(18% + 3.5rem);
   }
 
   .countdown-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 70px;
+    min-width: 80px;
   }
 
   .countdown-number {
@@ -196,10 +195,11 @@
   .countdown-label {
     font-family: 'Lato', sans-serif;
     font-size: 0.65rem;
-    letter-spacing: 0.25em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--oro);
     margin-top: 0.3rem;
+    white-space: nowrap;
   }
 
   .countdown-sep {
@@ -259,8 +259,15 @@
   }
 
   @media (max-width: 480px) {
-    .countdown-item { min-width: 55px; }
+    .countdown { gap: 0.3rem; }
+    .countdown-item { min-width: 66px; }
+    .countdown-label { font-size: 0.56rem; letter-spacing: 0.12em; }
     .countdown-sep { font-size: 1.5rem; }
+  }
+
+  @media (max-width: 360px) {
+    .countdown-item { min-width: 58px; }
+    .countdown-label { font-size: 0.52rem; letter-spacing: 0.08em; }
   }
 </style>
 

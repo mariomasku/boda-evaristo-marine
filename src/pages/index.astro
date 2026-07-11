@@ -13,11 +13,15 @@ import '../styles/global.css';
 
 <Layout>
   <nav id="navbar" class="navbar">
-    <div class="nav-names"><span class="dash-logo">Marine <span style="font-style:normal;color:color-mix(in srgb, var(--oro) 50%, transparent)">&</span> Evaristo</span></div>
-    <div class="nav-links">
-      <a href="#detalles" data-i18n="nav.day">El día</a>
-      <a href="#autobus" data-i18n="nav.bus">Bús</a>
-      <a href="#rsvp" data-i18n="nav.confirm">Confirmar</a>
+    <div class="navbar-row">
+      <div class="nav-names"><span class="dash-logo">Marine <span style="font-style:normal;color:color-mix(in srgb, var(--oro) 50%, transparent)">&</span> Evaristo</span></div>
+      <div class="nav-links">
+        <a href="#detalles" data-i18n="nav.day">El día</a>
+        <a href="#autobus" data-i18n="nav.bus">Bús</a>
+        <a href="#rsvp" data-i18n="nav.confirm">Confirmar</a>
+      </div>
+    </div>
+    <div class="navbar-lang-row">
       <LanguageSwitcher />
     </div>
   </nav>
@@ -43,9 +47,8 @@ import '../styles/global.css';
     right: 0;
     z-index: 100;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.2rem 2rem;
+    flex-direction: column;
+    padding: 1rem 2rem 0.3rem;
     transition: background 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
   }
 
@@ -53,6 +56,17 @@ import '../styles/global.css';
     background: color-mix(in srgb, var(--sombra) 92%, transparent);
     backdrop-filter: blur(12px);
     box-shadow: 0 1px 0 color-mix(in srgb, var(--oro) 15%, transparent);
+  }
+
+  .navbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .navbar-lang-row {
+    display: flex;
+    justify-content: center;
   }
 
   .nav-names {
@@ -81,7 +95,9 @@ import '../styles/global.css';
   .nav-links a:hover { color: var(--oro); }
 
   @media (max-width: 480px) {
-    .nav-links { gap: 1rem; }
+    .navbar-row { flex-direction: column; gap: 0.4rem; align-items: center; }
+    .nav-names { text-align: center; }
+    .nav-links { gap: 1rem; justify-content: center; }
     .nav-links a { font-size: 0.7rem; }
   }
 </style>
