@@ -9,6 +9,8 @@
 ## 0. Flujo de arranque — quién hace qué, y en qué orden
 
 > Esta sección resume el flujo real de trabajo entre el humano y Claude Code para arrancar una boda nueva, en el orden correcto. El resto del documento (§1 en adelante) es el detalle técnico de cada paso; esta sección es el "orden de la receta".
+>
+> **Atajo**: hay una skill global instalada (`~/.agents/skills/nueva-boda/`, symlink en `~/.claude/skills/nueva-boda`) que sigue este mismo orden de preguntas automáticamente. En vez de pegar este documento a mano, basta con invocar `/nueva-boda` desde Claude Code en la carpeta del proyecto nuevo.
 
 ### Antes de pedir nada a Claude Code (lo hace el humano)
 
