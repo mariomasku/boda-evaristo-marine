@@ -76,12 +76,12 @@ export const translations = {
     bus: {
       subtitle: 'para los de Córdoba',
       title: 'Autobús',
-      intro:
-        'Ponemos a vuestra disposición un autobús para los invitados de Córdoba. Podéis indicar si lo necesitáis en el formulario de confirmación.',
+      intro: 'Podéis indicar si necesitáis el autobús en el formulario de confirmación.',
       idaLabel: 'IDA',
       idaRoute: 'Córdoba → Finca El Capricho',
       idaSalida: 'SALIDA DESDE PUERTA DE ALMODÓVAR',
       idaMapLink: 'Ver punto de salida →',
+      vueltaPending: 'Horarios de vuelta por confirmar.',
       vueltaHeading: 'Hay dos opciones de vuelta para que podáis elegir la que mejor os venga.',
       vuelta1Label: 'VUELTA · PRIMER AUTOCAR',
       vueltaRoute: 'Finca El Capricho → Córdoba',
@@ -312,12 +312,12 @@ export const translations = {
     bus: {
       subtitle: 'pour ceux de Cordoue',
       title: 'Bus',
-      intro:
-        'Nous mettons à votre disposition un bus pour les invités venant de Cordoue. Vous pouvez indiquer si vous en avez besoin dans le formulaire de confirmation.',
+      intro: 'Vous pouvez indiquer si vous avez besoin du bus dans le formulaire de confirmation.',
       idaLabel: 'ALLER',
       idaRoute: 'Cordoue → Finca El Capricho',
       idaSalida: 'DÉPART DE PUERTA DE ALMODÓVAR',
       idaMapLink: 'Voir le point de départ →',
+      vueltaPending: 'Horaires de retour à confirmer.',
       vueltaHeading: 'Il y a deux options de retour pour que vous puissiez choisir celle qui vous convient le mieux.',
       vuelta1Label: 'RETOUR · PREMIER BUS',
       vueltaRoute: 'Finca El Capricho → Cordoue',

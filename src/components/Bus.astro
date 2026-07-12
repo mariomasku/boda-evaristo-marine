@@ -3,12 +3,10 @@ import SectionTitle from './SectionTitle.astro';
 ---
 <section id="autobus" class="bus-section">
   <div class="bus-container">
-    <p class="section-subtitle bus-subtitle gsap-fade" data-i18n="bus.subtitle">para los de Córdoba</p>
     <SectionTitle i18n="bus.title">Autobús</SectionTitle>
 
     <p class="bus-intro gsap-fade" data-i18n="bus.intro">
-      Ponemos a vuestra disposición un autobús para los invitados de Córdoba.
-      Podéis indicar si lo necesitáis en el formulario de confirmación.
+      Podéis indicar si necesitáis el autobús en el formulario de confirmación.
     </p>
 
     <div class="bus-ida-wrap">
@@ -26,6 +24,16 @@ import SectionTitle from './SectionTitle.astro';
         >Ver punto de salida →</a>
       </div>
     </div>
+
+    <p class="bus-vuelta-pending gsap-fade" data-i18n="bus.vueltaPending">
+      Horarios de vuelta por confirmar.
+    </p>
+
+    <!--
+      Horarios de vuelta (Finca El Capricho -> Córdoba) ocultos
+      temporalmente a la espera de que los novios los confirmen.
+      Descomentar cuando tengamos la información definitiva
+      (y quitar el párrafo bus-vuelta-pending de arriba).
 
     <p class="bus-vuelta-heading gsap-fade" data-i18n="bus.vueltaHeading">
       Hay dos opciones de vuelta para que podáis elegir la que mejor os venga.
@@ -46,6 +54,7 @@ import SectionTitle from './SectionTitle.astro';
         <div class="bus-time">06:00h</div>
       </div>
     </div>
+    -->
   </div>
 </section>
 
@@ -165,6 +174,16 @@ import SectionTitle from './SectionTitle.astro';
 
   .bus-ida-wrap .bus-card {
     flex: 0 1 320px;
+  }
+
+  /* ── Aviso temporal: horario de vuelta pendiente ── */
+  .bus-vuelta-pending {
+    font-family: 'Lato', sans-serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--salvia);
+    text-align: center;
+    margin-top: 1rem;
   }
 
   /* ── Encabezado destacado de vuelta ── */
