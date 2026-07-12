@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
 import Welcome from '../components/Welcome.astro';
+import Preboda from '../components/Preboda.astro';
 import Details from '../components/Details.astro';
 import Bus from '../components/Bus.astro';
 import RSVP from '../components/RSVP.astro';
@@ -16,7 +17,7 @@ import '../styles/global.css';
     <div class="navbar-row">
       <div class="nav-names"><span class="dash-logo">Marine <span style="font-style:normal;color:color-mix(in srgb, var(--oro) 50%, transparent)">&</span> Evaristo José</span></div>
       <div class="nav-links">
-        <a href="#detalles" data-i18n="nav.day">El día</a>
+        <a href="#preboda" data-i18n="nav.day">El día</a>
         <a href="#autobus" data-i18n="nav.bus">Bús</a>
         <a href="#rsvp" data-i18n="nav.confirm">Confirmar</a>
         <div class="navbar-lang-row">
@@ -29,6 +30,7 @@ import '../styles/global.css';
   <main>
     <Hero />
     <Welcome />
+    <Preboda />
     <Details />
     <PhotoParallax foto="/fotos/Foto01.webp" height="60vh" />
     <Bus />
@@ -80,6 +82,7 @@ import '../styles/global.css';
   .nav-links {
     display: flex;
     gap: 2rem;
+    align-items: center;
   }
 
   .nav-links a {

@@ -426,9 +426,9 @@ import LanguageSwitcher from '../components/LanguageSwitcher.astro';
             <p class="stat-card-label" data-i18n="dashboard.catConfirmados">Confirmados</p>
             <p class="stat-card-value gold" id="s-total">—</p>
           </button>
-          <button type="button" class="stat-card" data-cat="noasisten">
-            <p class="stat-card-label" data-i18n="dashboard.catNoAsisten">No asisten</p>
-            <p class="stat-card-value muted" id="s-no">—</p>
+          <button type="button" class="stat-card" data-cat="preboda">
+            <p class="stat-card-label" data-i18n="dashboard.catPreboda">Preboda</p>
+            <p class="stat-card-value" id="s-preboda">—</p>
           </button>
           <button type="button" class="stat-card" data-cat="adultos">
             <p class="stat-card-label" data-i18n="dashboard.catAdultos">Adultos</p>
@@ -597,7 +597,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher.astro';
       set('s-total',      data.asistencia.total);
       set('s-adultos',    data.asistencia.adultos);
       set('s-ninos',      data.asistencia.ninos);
-      set('s-no',         data.asistencia.noAsisten);
+      set('s-preboda',    data.asistencia.preboda);
       set('s-bus-ida',    data.autobus.ida);
       set('s-bus-vuelta', data.autobus.vuelta);
 
@@ -607,7 +607,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher.astro';
         confirmados: { titulo: t(lang, 'dashboard.catConfirmados'), lista: asis.listaConfirmados ?? [] },
         adultos:     { titulo: t(lang, 'dashboard.catAdultos'),     lista: asis.listaAdultos ?? [] },
         ninos:       { titulo: t(lang, 'dashboard.catNinos'),       lista: asis.listaNinos ?? [], showAge: true },
-        noasisten:   { titulo: t(lang, 'dashboard.catNoAsisten'),   lista: asis.listaNoAsisten ?? [] },
+        preboda:     { titulo: t(lang, 'dashboard.catPreboda'),     lista: asis.listaPreboda ?? [] },
       };
       document.querySelectorAll<HTMLButtonElement>('.stat-card[data-cat]').forEach(card => {
         const cfg = catMap[card.dataset.cat!];

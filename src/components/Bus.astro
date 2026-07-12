@@ -15,8 +15,15 @@ import SectionTitle from './SectionTitle.astro';
       <div class="bus-card bus-card-ida">
         <div class="bus-direction" data-i18n="bus.idaLabel">IDA</div>
         <div class="bus-route" data-i18n="bus.idaRoute">Córdoba → Finca El Capricho</div>
-        <div class="bus-direction" data-i18n="bus.idaSalida">SALIDA DESDE CÓRDOBA</div>
-        <div class="bus-time">17:15h</div>
+        <div class="bus-direction" data-i18n="bus.idaSalida">SALIDA DESDE PUERTA DE ALMODÓVAR</div>
+        <div class="bus-time">18:00h</div>
+        <a
+          href="https://maps.app.goo.gl/DX1rZZSyfFRoUjFJ6"
+          target="_blank"
+          rel="noopener"
+          class="bus-map-link"
+          data-i18n="bus.idaMapLink"
+        >Ver punto de salida →</a>
       </div>
     </div>
 
@@ -227,6 +234,20 @@ import SectionTitle from './SectionTitle.astro';
     margin-top: 0.3rem;
     font-style: italic;
   }
+
+  .bus-map-link {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: var(--salvia);
+    text-decoration: none;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid color-mix(in srgb, var(--oro) 40%, transparent);
+    transition: color 0.2s;
+  }
+
+  .bus-map-link:hover { color: var(--eucalipto); }
 
   @media (max-width: 580px) {
     .bus-routes {

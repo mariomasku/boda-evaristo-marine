@@ -21,9 +21,24 @@ import SectionTitle from './SectionTitle.astro';
         <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre completo" data-i18n-placeholder="rsvp.q1Placeholder" />
       </div>
 
-      <!-- 2. Asistencia -->
+      <!-- 2. Preboda -->
       <div class="form-group">
-        <label data-i18n="rsvp.q2Label">2. ¿Asistirás a nuestra boda? *</label>
+        <label data-i18n="rsvp.prebodaLabel">2. ¿Asistiréis a la fiesta de bienvenida del 1 de octubre? *</label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="preboda_asistencia" value="Sí" required />
+            <span data-i18n="rsvp.yes">Sí</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="preboda_asistencia" value="No" />
+            <span data-i18n="rsvp.no">No</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 3. Asistencia -->
+      <div class="form-group">
+        <label data-i18n="rsvp.q2Label">3. ¿Asistirás a nuestra boda? *</label>
         <div class="radio-group">
           <label class="radio-option">
             <input type="radio" name="asistencia" value="Sí, ¡allí estaré!" required />
@@ -41,7 +56,7 @@ import SectionTitle from './SectionTitle.astro';
 
       <!-- 3. Acompañante -->
       <div class="form-group">
-        <label data-i18n="rsvp.q3Label">3. ¿Vienes con acompañante?</label>
+        <label data-i18n="rsvp.q3Label">4. ¿Vienes con acompañante?</label>
         <div class="radio-group" id="acompanante-radios">
           <label class="radio-option">
             <input type="radio" name="acompanante" value="si" id="acomp-si" />
@@ -59,7 +74,7 @@ import SectionTitle from './SectionTitle.astro';
 
       <!-- 4. Niños -->
       <div class="form-group">
-        <label data-i18n="rsvp.q4Label">4. ¿Traes niños?</label>
+        <label data-i18n="rsvp.q4Label">5. ¿Traes niños?</label>
         <div class="radio-group">
           <label class="radio-option">
             <input type="radio" name="ninos" value="si" id="ninos-si" />
@@ -75,7 +90,7 @@ import SectionTitle from './SectionTitle.astro';
       <!-- 5. Datos niños (dinámico) -->
       <div id="ninos-block" style="display:none" class="ninos-wrapper">
         <div class="form-group">
-          <label data-i18n="rsvp.q5Label">5. ¿Cuántos niños traes?</label>
+          <label data-i18n="rsvp.q5Label">6. ¿Cuántos niños traes?</label>
           <div class="ninos-count-picker" id="ninos-count-picker">
             <button type="button" class="ninos-count-btn" data-value="1">1</button>
             <button type="button" class="ninos-count-btn" data-value="2">2</button>
@@ -90,7 +105,7 @@ import SectionTitle from './SectionTitle.astro';
 
       <!-- 6. Intolerancias alimentarias -->
       <div class="form-group">
-        <label data-i18n="rsvp.q6Label">6. ¿Algún miembro de tu grupo tiene alguna intolerancia o alergia alimentaria? *</label>
+        <label data-i18n="rsvp.q6Label">7. ¿Algún miembro de tu grupo tiene alguna intolerancia o alergia alimentaria? *</label>
         <div class="radio-group">
           <label class="radio-option">
             <input type="radio" name="tiene_intolerancias" value="no" id="intol-no" />
@@ -110,7 +125,7 @@ import SectionTitle from './SectionTitle.astro';
 
       <!-- 7. Bebida -->
       <div class="form-group">
-        <label data-i18n="rsvp.q7Label">7. ¿Qué bebida no puede faltar en la barra libre?</label>
+        <label data-i18n="rsvp.q7Label">8. ¿Qué bebida no puede faltar en la barra libre?</label>
         <div class="checkbox-group">
           <label class="checkbox-option">
             <input type="checkbox" name="bebida" value="Whisky" />
@@ -133,7 +148,7 @@ import SectionTitle from './SectionTitle.astro';
 
       <!-- 8. Autobús -->
       <div class="form-group">
-        <label data-i18n="rsvp.q8Label">8. Para los de Córdoba: ¿necesitarás el autobús?</label>
+        <label data-i18n="rsvp.q8Label">9. Para los de Córdoba: ¿necesitarás el autobús?</label>
         <div class="radio-group" id="bus-radios">
           <label class="radio-option">
             <input type="radio" name="autobus" value="Ida y vuelta" id="bus-idavuelta" />
@@ -156,20 +171,20 @@ import SectionTitle from './SectionTitle.astro';
 
       <!-- 9. Plazas autobús -->
       <div class="form-group conditional" id="bus-plazas-block" style="display:none">
-        <label data-i18n="rsvp.q9Label">9. ¿Cuántas plazas necesitarías?</label>
+        <label data-i18n="rsvp.q9Label">10. ¿Cuántas plazas necesitarías?</label>
         <div class="ninos-count-picker" id="bus-plazas-picker"></div>
         <input type="hidden" name="bus_plazas" id="bus_plazas" />
       </div>
 
       <!-- 10. Canción -->
       <div class="form-group">
-        <label for="cancion" data-i18n="rsvp.q10Label">10. ¿Qué canción no puede faltar en la pista de baile?</label>
+        <label for="cancion" data-i18n="rsvp.q10Label">11. ¿Qué canción no puede faltar en la pista de baile?</label>
         <input type="text" id="cancion" name="cancion" placeholder="¡Esa que hace que lo des todo!" data-i18n-placeholder="rsvp.q10Placeholder" />
       </div>
 
       <!-- 11. Comentarios -->
       <div class="form-group">
-        <label for="comentarios" data-i18n="rsvp.q11Label">11. ¿Tienes alguna otra duda o comentario?</label>
+        <label for="comentarios" data-i18n="rsvp.q11Label">12. ¿Tienes alguna otra duda o comentario?</label>
         <textarea id="comentarios" name="comentarios" rows="4" placeholder="Cuéntanos..." data-i18n-placeholder="rsvp.q11Placeholder"></textarea>
         <div class="photo-hint">
           <img src="/icons/fotos.svg" alt="" aria-hidden="true" class="photo-hint-icon" />

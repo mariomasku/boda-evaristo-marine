@@ -46,10 +46,10 @@ export const GET: APIRoute = async () => {
     const auth   = new google.auth.GoogleAuth({ credentials, scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'] });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    const res  = await sheets.spreadsheets.values.get({ spreadsheetId, range: 'RSVP!A2:M' });
+    const res  = await sheets.spreadsheets.values.get({ spreadsheetId, range: 'RSVP!A2:N' });
     const rows = (res.data.values ?? []) as string[][];
 
-    // Col indices (0-based): B=1(NOMBRE), C=2(ROL), E=4(ASISTENCIA), F=5(EDAD), G=6(INTOL), H=7(OTROS), I=8(BEBIDA), J=9(AUTOBUS), K=10(PLAZAS)
+    // Col indices (0-based): B=1(NOMBRE), C=2(ROL), E=4(ASISTENCIA), F=5(EDAD), G=6(INTOL), H=7(OTROS), I=8(BEBIDA), J=9(AUTOBUS), K=10(PLAZAS), N=13(PREBODA)
     const isNino = (r: string[]) => eq(r[2], 'Niño/a');
     const named  = (arr: string[][]) => arr.filter(r => r[1]);
 
@@ -57,6 +57,7 @@ export const GET: APIRoute = async () => {
     const noRows   = rows.filter(r => eq(r[4], 'No'));
     const adultRows = si.filter(r => !isNino(r));
     const ninoRows  = si.filter(r => isNino(r));
+    const prebodaRows = rows.filter(r => eq(r[13], 'Sí'));
 
     const idaRows    = si.filter(r => (eq(r[9], 'Ida y vuelta') || eq(r[9], 'Solo ida'))    && r[1]);
     const vueltaRows = si.filter(r => (eq(r[9], 'Ida y vuelta') || eq(r[9], 'Solo vuelta')) && r[1]);
@@ -101,10 +102,12 @@ export const GET: APIRoute = async () => {
       totalRegistros: totalRows,
       asistencia: {
         total: si.length, adultos: adultRows.length, ninos: ninoRows.length, noAsisten: noRows.length,
+        preboda: prebodaRows.length,
         listaConfirmados: named(si).map(r => toPersona(r)),
         listaAdultos:     named(adultRows).map(r => toPersona(r)),
         listaNinos:       named(ninoRows).map(r => toPersona(r)),
         listaNoAsisten:   named(noRows).map(r => toPersona(r)),
+        listaPreboda:     named(prebodaRows).map(r => toPersona(r)),
       },
       autobus: {
         ida: busIda, vuelta: busVuelta,

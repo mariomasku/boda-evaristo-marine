@@ -10,7 +10,7 @@ const RESUMEN_TAB = 'RESUMEN';
 const HEADERS = [
   'FECHA', 'NOMBRE', 'ROL', 'ACOMPAÑANTE DE', 'ASISTENCIA', 'EDAD',
   'INTOLERANCIAS', 'OTROS ALERGENOS', 'BEBIDA', 'AUTOBÚS', 'PLAZAS BUS',
-  'CANCIÓN', 'COMENTARIOS',
+  'CANCIÓN', 'COMENTARIOS', 'PREBODA',
 ];
 
 // Convierte un hex "rrggbb" al formato RGB 0-1 que usa la API de Sheets.
@@ -161,10 +161,10 @@ async function autoResizeColumns(
 
 // ── Contenido del RESUMEN ─────────────────────────────────────
 // Layout (0-indexed → 1-indexed):
-// 0→1: Título  |  2→3: ASISTENCIA section  |  3-6→4-7: datos asist
-// 8→9: AUTOBÚS section  |  9-10→10-11: datos bus
-// 12→13: INTOLERANCIAS section  |  13→14: sub-header  |  14-28→15-29: datos
-// 30→31: BEBIDAS section  |  31→32: sub-header  |  32-35→33-36: datos
+// 0→1: Título  |  2→3: ASISTENCIA section  |  3-7→4-8: datos asist (incl. preboda)
+// 9→10: AUTOBÚS section  |  10-11→11-12: datos bus
+// 13→14: INTOLERANCIAS section  |  14→15: sub-header  |  15-29→16-30: datos
+// 31→32: BEBIDAS section  |  32→33: sub-header  |  33-36→34-37: datos
 async function writeResumen(sheets: any, spreadsheetId: string) {
   const t = RSVP_TAB;
   // Separador ';' requerido en locale español de Google Sheets
@@ -176,7 +176,7 @@ async function writeResumen(sheets: any, spreadsheetId: string) {
     ['', ''],
     // 2: ASISTENCIA
     ['ASISTENCIA', ''],
-    // 3–6: datos asistencia
+    // 3–7: datos asistencia
     ['Total confirmados (SÍ)',
       f(`COUNTIF(${t}!E:E;"SÍ")`)],
     ['  Adultos (invitados + acompañantes)',
@@ -185,22 +185,24 @@ async function writeResumen(sheets: any, spreadsheetId: string) {
       f(`COUNTIFS(${t}!E:E;"SÍ";${t}!C:C;"NIÑO/A")`)],
     ['No asisten (NO)',
       f(`COUNTIF(${t}!E:E;"NO")`)],
-    // 7: vacío
+    ['Asisten a la fiesta de bienvenida (1 oct., SÍ)',
+      f(`COUNTIF(${t}!N:N;"SÍ")`)],
+    // 8: vacío
     ['', ''],
-    // 8: AUTOBÚS
+    // 9: AUTOBÚS
     ['AUTOBÚS', ''],
-    // 9–10: plazas
-    ['Plazas IDA solicitadas (17:15h)',
+    // 10–11: plazas
+    ['Plazas IDA solicitadas (18:00h)',
       f(`SUMIF(${t}!J:J;"IDA Y VUELTA";${t}!K:K)+SUMIF(${t}!J:J;"SOLO IDA";${t}!K:K)`)],
     ['Plazas VUELTA solicitadas',
       f(`SUMIF(${t}!J:J;"IDA Y VUELTA";${t}!K:K)+SUMIF(${t}!J:J;"SOLO VUELTA";${t}!K:K)`)],
-    // 11: vacío
+    // 12: vacío
     ['', ''],
-    // 12: INTOLERANCIAS
+    // 13: INTOLERANCIAS
     ['INTOLERANCIAS / ALERGIAS', ''],
-    // 13: sub-header
+    // 14: sub-header
     ['Alérgeno', 'Personas'],
-    // 14–28: 14 alérgenos + Otros
+    // 15–29: 14 alérgenos + Otros
     ['Gluten (celiaquía)',     f(`COUNTIF(${t}!G:G;"*GLUTEN*")`)],
     ['Lactosa / lácteos',      f(`COUNTIF(${t}!G:G;"*LACTOSA*")`)],
     ['Huevo',                  f(`COUNTIF(${t}!G:G;"*HUEVO*")`)],
@@ -216,13 +218,13 @@ async function writeResumen(sheets: any, spreadsheetId: string) {
     ['Altramuces (lupino)',     f(`COUNTIF(${t}!G:G;"*ALTRAMUCES*")`)],
     ['Moluscos',               f(`COUNTIF(${t}!G:G;"*MOLUSCOS*")`)],
     ['Otros alergias especificadas', f(`COUNTA(${t}!H:H)-1`)],
-    // 29: vacío
+    // 30: vacío
     ['', ''],
-    // 30: BEBIDAS
+    // 31: BEBIDAS
     ['BEBIDAS PREFERIDAS', ''],
-    // 31: sub-header
+    // 32: sub-header
     ['Bebida', 'Personas'],
-    // 32–35: bebidas
+    // 33–36: bebidas
     ['Whisky',  f(`COUNTIF(${t}!I:I;"*WHISKY*")`)],
     ['Ginebra', f(`COUNTIF(${t}!I:I;"*GINEBRA*")`)],
     ['Ron',     f(`COUNTIF(${t}!I:I;"*RON*")`)],
@@ -245,8 +247,8 @@ async function applyTheme(
   resId: number,
   addChart: boolean,
 ) {
-  const SECTION_ROWS = [2, 8, 12, 30]; // 0-indexed, filas de sección en RESUMEN
-  const SUBHEADER_ROWS = [13, 31];     // 0-indexed, filas de sub-cabecera
+  const SECTION_ROWS = [2, 9, 13, 31]; // 0-indexed, filas de sección en RESUMEN
+  const SUBHEADER_ROWS = [14, 32];     // 0-indexed, filas de sub-cabecera
 
   const reqs: any[] = [
     // ── RSVP: cabecera ──
@@ -265,7 +267,7 @@ async function applyTheme(
       },
     },
     // RSVP: anchos de columna
-    ...[120, 175, 95, 155, 55, 45, 200, 155, 115, 95, 75, 175, 195].map((px, i) => ({
+    ...[120, 175, 95, 155, 55, 45, 200, 155, 115, 95, 75, 175, 195, 65].map((px, i) => ({
       updateDimensionProperties: {
         range: { sheetId: rsvpId, dimension: 'COLUMNS', startIndex: i, endIndex: i + 1 },
         properties: { pixelSize: px },
@@ -351,7 +353,7 @@ async function applyTheme(
     // RESUMEN: columna B (números) centrada, en negrita y formato entero
     {
       repeatCell: {
-        range: { sheetId: resId, startRowIndex: 3, endRowIndex: 36, startColumnIndex: 1, endColumnIndex: 2 },
+        range: { sheetId: resId, startRowIndex: 3, endRowIndex: 37, startColumnIndex: 1, endColumnIndex: 2 },
         cell: {
           userEnteredFormat: {
             horizontalAlignment: 'CENTER',
@@ -380,7 +382,7 @@ async function applyTheme(
     // RESUMEN: filas de datos con fondo crema alternado para intolerancias (14-28)
     ...Array.from({ length: 15 }, (_, i) => ({
       repeatCell: {
-        range: { sheetId: resId, startRowIndex: 14 + i, endRowIndex: 15 + i, startColumnIndex: 0, endColumnIndex: 2 },
+        range: { sheetId: resId, startRowIndex: 15 + i, endRowIndex: 16 + i, startColumnIndex: 0, endColumnIndex: 2 },
         cell: {
           userEnteredFormat: {
             backgroundColor: i % 2 === 0 ? WHITE : rgb('eef4f0'),
@@ -411,7 +413,7 @@ async function applyTheme(
                   sourceRange: {
                     sources: [{
                       sheetId: resId,
-                      startRowIndex: 13, endRowIndex: 29,
+                      startRowIndex: 14, endRowIndex: 30,
                       startColumnIndex: 0, endColumnIndex: 1,
                     }],
                   },
@@ -422,7 +424,7 @@ async function applyTheme(
                   sourceRange: {
                     sources: [{
                       sheetId: resId,
-                      startRowIndex: 13, endRowIndex: 29,
+                      startRowIndex: 14, endRowIndex: 30,
                       startColumnIndex: 1, endColumnIndex: 2,
                     }],
                   },
@@ -436,7 +438,7 @@ async function applyTheme(
           },
           position: {
             overlayPosition: {
-              anchorCell: { sheetId: resId, rowIndex: 37, columnIndex: 0 },
+              anchorCell: { sheetId: resId, rowIndex: 38, columnIndex: 0 },
               widthPixels: 620,
               heightPixels: 360,
             },
@@ -474,6 +476,7 @@ export const POST: APIRoute = async ({ request }) => {
     const fecha       = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
     const nombre      = cap(data.nombre);
     const asistencia  = String(data.asistencia ?? '').startsWith('S') ? 'Sí' : 'No';
+    const preboda     = String(data.preboda_asistencia ?? '').startsWith('S') ? 'Sí' : 'No';
     const bebida      = cap(data.bebida);
     const autobusRaw  = String(data.autobus ?? '');
     const autobus     = autobusRaw.startsWith('No lo') ? 'No' : cap(autobusRaw);
@@ -487,7 +490,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Invitado principal
     const { intol: intolInv, otros: otrosInv } = buildIntol(data, 'invitado');
-    rows.push([fecha, nombre, 'Invitado', '', asistencia, '', intolInv, otrosInv, bebida, autobus, busPlazas, cancion, comentarios]);
+    rows.push([fecha, nombre, 'Invitado', '', asistencia, '', intolInv, otrosInv, bebida, autobus, busPlazas, cancion, comentarios, preboda]);
     rowTypes.push('invitado');
 
     if (asistencia === 'Sí') {
@@ -495,7 +498,7 @@ export const POST: APIRoute = async ({ request }) => {
       if (data.acompanante === 'si' && data.acompanante_nombre) {
         const acN = cap(data.acompanante_nombre);
         const { intol: intolAc, otros: otrosAc } = buildIntol(data, 'acompanante');
-        rows.push([fecha, acN, 'Acompañante', nombre, 'Sí', '', intolAc, otrosAc, '', '', '', '', '']);
+        rows.push([fecha, acN, 'Acompañante', nombre, 'Sí', '', intolAc, otrosAc, '', '', '', '', '', preboda]);
         rowTypes.push('acompanante');
       }
       // Niños
@@ -505,7 +508,7 @@ export const POST: APIRoute = async ({ request }) => {
           const nn   = cap(data[`nino_${i}_nombre`]);
           const edad = String(data[`nino_${i}_edad`] || '');
           const { intol: intolN, otros: otrosN } = buildIntol(data, `nino_${i}`);
-          rows.push([fecha, nn, 'Niño/a', nombre, 'Sí', edad, intolN, otrosN, '', '', '', '', '']);
+          rows.push([fecha, nn, 'Niño/a', nombre, 'Sí', edad, intolN, otrosN, '', '', '', '', '', preboda]);
           rowTypes.push('nino');
         }
       }

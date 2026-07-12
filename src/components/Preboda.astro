@@ -1,0 +1,270 @@
+---
+import SectionTitle from './SectionTitle.astro';
+---
+<section id="preboda" class="preboda-section">
+  <div class="container">
+    <p class="section-subtitle gsap-fade" data-i18n="preboda.subtitle">la víspera</p>
+    <SectionTitle i18n="preboda.title">Fiesta de bienvenida</SectionTitle>
+
+    <p class="event-date gsap-fade" data-i18n="preboda.eventDate">Jueves · 1 de octubre · 2026</p>
+    <button class="cal-btn gsap-fade" id="preboda-cal-btn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="1" y="3" width="14" height="12" rx="1.5"/>
+        <path d="M1 7h14M5 1v4M11 1v4"/>
+      </svg>
+      <span data-i18n="preboda.calBtn">Añadir a mi calendario</span>
+    </button>
+
+    <div class="preboda-item gsap-fade">
+      <div class="preboda-icon-wrap">
+        <img src="/icons/fiesta.svg" alt="" class="preboda-icon" aria-hidden="true" />
+      </div>
+      <time class="preboda-time">21:30 – 01:00h</time>
+      <p class="preboda-name" data-i18n="preboda.title">Fiesta de bienvenida</p>
+      <p class="preboda-desc" data-i18n="preboda.description">Acompáñanos para disfrutar de una velada a orillas del Guadalquivir, con música y cócteles.</p>
+    </div>
+  </div>
+
+  <div class="container" id="preboda-mapa">
+    <p class="section-subtitle gsap-fade como-llegar" data-i18n="details.comoLlegar">Cómo llegar</p>
+    <div class="ornament gsap-fade">
+      <span style="color: var(--oro); font-size:1.2rem;">✦</span>
+    </div>
+  </div>
+
+  <div class="map-wrapper gsap-fade">
+    <div class="map-label">
+      <span data-i18n="preboda.mapLabel">📍 P.º de la Ribera, 1 · Centro, Córdoba</span>
+      <a
+        href="https://www.google.com/maps/search/?api=1&query=Paseo+de+la+Ribera+1%2C+C%C3%B3rdoba%2C+Espa%C3%B1a"
+        target="_blank"
+        rel="noopener"
+        class="map-open-link"
+        data-i18n="details.mapOpenLink"
+      >Abrir en Google Maps →</a>
+    </div>
+    <iframe
+      title="Localización de la fiesta de bienvenida"
+      data-i18n-title="preboda.mapTitle"
+      src="https://maps.google.com/maps?q=Paseo+de+la+Ribera+1,+C%C3%B3rdoba,+Espa%C3%B1a&output=embed&z=16"
+      width="100%"
+      height="400"
+      style="border:0"
+      allowfullscreen
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
+  </div>
+</section>
+
+<script>
+  import { t, getCurrentLang } from '../i18n/apply';
+
+  function buildIcs(): string {
+    const lang = getCurrentLang();
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Boda Marine y Evaristo//ES',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      'DTSTART;TZID=Europe/Madrid:20261001T213000',
+      'DTEND;TZID=Europe/Madrid:20261002T010000',
+      `SUMMARY:${t(lang, 'preboda.icsSummary')}`,
+      `LOCATION:${t(lang, 'preboda.icsLocation').replace(/,/g, '\\,')}`,
+      `DESCRIPTION:${t(lang, 'preboda.icsDescription')}`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+  }
+
+  document.getElementById('preboda-cal-btn')?.addEventListener('click', async () => {
+    const lang = getCurrentLang();
+    const filename = t(lang, 'preboda.icsFilename');
+    const blob = new Blob([buildIcs()], { type: 'text/calendar;charset=utf-8' });
+    const file = new File([blob], filename, { type: 'text/calendar' });
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+    if (navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch (err) {
+        if ((err as DOMException).name === 'AbortError') return;
+      }
+    }
+
+    if (isIOS) {
+      // Sin fichero .ics estático propio: en iOS sin canShare, descargamos igualmente
+      const url = URL.createObjectURL(blob);
+      window.location.href = url;
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a   = document.createElement('a');
+    a.href     = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+</script>
+
+<style>
+  .preboda-section {
+    padding: 6rem 1.5rem 0;
+    background: var(--crema);
+    background-image: url(../../public/img/fondo-floral2.webp);
+  }
+
+  .preboda-section > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 4rem;
+  }
+
+  .section-subtitle { margin-bottom: 0.25rem; }
+  .section-title { margin-bottom: 0; }
+
+  .event-date {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-style: italic;
+    color: var(--salvia);
+    text-align: center;
+    letter-spacing: 0.03em;
+    margin: 0;
+  }
+
+  .cal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.65rem 1.5rem;
+    border: 1px solid var(--oro);
+    background: transparent;
+    color: var(--eucalipto);
+    font-family: 'Lato', sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin-bottom: 0.5rem;
+  }
+
+  .cal-btn:hover {
+    background: var(--oro);
+    color: var(--blanco);
+  }
+
+  /* ── Evento único (sin timeline vertical) ── */
+  .preboda-item {
+    margin: 2.5rem auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    text-align: center;
+  }
+
+  .preboda-icon-wrap {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--marfil);
+    border: 1px solid color-mix(in srgb, var(--oro) 45%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  .preboda-icon {
+    width: 60px;
+    height: 60px;
+    filter: brightness(0) sepia(1) saturate(0.5) brightness(0.65);
+  }
+
+  .preboda-time {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--eucalipto);
+    font-style: italic;
+    line-height: 1;
+  }
+
+  .preboda-name {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.76rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--salvia);
+    margin: 0.4rem 0 0;
+  }
+
+  .preboda-desc {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.9rem;
+    color: var(--eucalipto);
+    max-width: 480px;
+    line-height: 1.7;
+    margin: 0.5rem 0 0;
+  }
+
+  /* ── Mapa (mismo estilo que Details.astro) ── */
+  .map-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 5rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px color-mix(in srgb, var(--sombra) 10%, transparent);
+  }
+
+  .map-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1rem;
+    background: var(--crema);
+    border-top: 2px solid var(--oro);
+    font-family: 'Lato', sans-serif;
+    font-size: 0.85rem;
+    color: var(--eucalipto);
+  }
+
+  .map-open-link {
+    color: var(--salvia);
+    text-decoration: none;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+
+  .map-open-link:hover { color: var(--eucalipto); }
+
+  .map-wrapper iframe {
+    display: block;
+    filter: grayscale(20%) contrast(1.05);
+  }
+
+  @media (max-width: 480px) {
+    .preboda-icon-wrap { width: 100px; height: 100px; }
+    .preboda-icon { width: 60px; height: 60px; }
+    .map-label { flex-direction: column; gap: 0.4rem; text-align: center; }
+  }
+</style>
