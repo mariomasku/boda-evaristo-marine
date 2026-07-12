@@ -24,11 +24,13 @@ export const translations = {
       scroll: 'Desliza hacia arriba',
     },
     welcome: {
-      p1: 'Hay días que merecen ser celebrados por todo lo alto, y este es, sin duda, uno de ellos.',
-      p2: 'Por eso nos hace muchísima ilusión que nos acompañes. Vengas de cerca, de lejos, del norte, del sur o con unas cuantas horas de viaje a tu espalda, lo único que de verdad importa es que estés allí.',
-      p3: 'Queremos reunir a las personas que más queremos para compartir risas, abrazos, algún que otro baile improvisado y, con suerte, muy pocas lágrimas (aunque no prometemos nada).',
+      title: 'Nuestra historia',
+      subtitle: 'Los viajes más bonitos son a veces aquellos que no habíamos planeado.',
+      p1: 'En Córdoba, vine en busca de una experiencia universitaria. Cuando me inscribí en el programa Erasmus, no imaginaba que esa partida iba a transformar mi vida.',
+      p2: 'Unos meses más tarde, la llegada de Julie nos invitó a tomar la decisión más importante de nuestras vidas. Sin un plan establecido, (a veces) a ciegas, pero siempre de la mano, decidimos construir nuestro futuro juntos y formar nuestra familia.',
+      p3: 'Año tras año, aprendimos a crecer el uno junto al otro, a superar los desafíos y a disfrutar de las alegrías que la vida nos ofrecía. En 2016 llegó Lucas para hacer crecer nuestra familia y encontramos nuestro equilibrio.',
       closing:
-        'Porque ese día no habrá distancias, ni acentos, ni kilómetros: solo gente bonita celebrando lo que nos ha traído hasta aquí… ',
+        'Quince años después, vamos a celebrar todos juntos no solo nuestra unión, sino también todo el camino recorrido.',
       amorSvg: 'el amor.',
     },
     details: {
@@ -240,11 +242,13 @@ export const translations = {
       scroll: 'Faites glisser vers le haut',
     },
     welcome: {
-      p1: "Il y a des jours qui méritent d'être célébrés en grande pompe, et celui-ci en fait indéniablement partie.",
-      p2: "C'est pourquoi cela nous ferait tellement plaisir que tu sois avec nous. Que tu viennes de près, de loin, du nord, du sud, ou après plusieurs heures de voyage, la seule chose qui compte vraiment, c'est que tu sois là.",
-      p3: "Nous voulons réunir les personnes que nous aimons le plus pour partager des rires, des câlins, quelques pas de danse improvisés et, avec un peu de chance, très peu de larmes (mais on ne promet rien).",
+      title: 'Notre histoire',
+      subtitle: "Les plus beaux voyages sont parfois ceux que nous n'avions pas planifiés.",
+      p1: "À Cordoue, j'étais venue chercher une expérience universitaire. Quand je me suis inscrite au programme Erasmus, je n'imaginais pas que ce départ allait transformer ma vie.",
+      p2: "Quelques mois plus tard, l'arrivée de Julie nous a poussés à prendre la décision la plus importante de notre vie. Sans plan établi, (parfois) à l'aveugle, mais toujours main dans la main, nous avons décidé de construire notre avenir ensemble et de fonder notre famille.",
+      p3: "Année après année, nous avons appris à grandir l'un à côté de l'autre, à surmonter les défis et à profiter des joies que la vie nous offrait. En 2016, Lucas est arrivé pour agrandir notre famille, et nous avons trouvé notre équilibre.",
       closing:
-        "Parce que ce jour-là, il n'y aura ni distances, ni accents, ni kilomètres : seulement de belles personnes célébrant ce qui nous a menés jusqu'ici… ",
+        'Quinze ans plus tard, nous allons célébrer tous ensemble non seulement notre union, mais aussi tout le chemin parcouru.',
       amorSvg: "l'amour.",
     },
     details: {
