@@ -25,12 +25,12 @@ export const translations = {
     },
     welcome: {
       title: 'Nuestra historia',
-      subtitle: 'Los viajes más bonitos son a veces aquellos que no habíamos planeado.',
-      p1: 'A Córdoba vine en busca de una experiencia universitaria. Cuando me inscribí en el programa Erasmus, no imaginaba que esa partida iba a transformar mi vida.',
-      p2: 'Unos meses más tarde, la llegada de Julie nos invitó a tomar la decisión más importante de nuestras vidas. Sin un plan establecido, (a veces) a ciegas, pero siempre de la mano, decidimos construir nuestro futuro juntos y formar nuestra familia.',
-      p3: 'Año tras año, aprendimos a crecer el uno junto al otro, a superar los desafíos y a disfrutar de las alegrías que la vida nos ofrecía. En 2016 llegó Lucas para hacer crecer nuestra familia y encontramos nuestro equilibrio.',
+      subtitle: 'Los viajes más bellos son, a veces, aquellos que no hemos planeado.',
+      p1: 'Nunca había imaginado mi vida fuera de Córdoba. Pero una noche nuestras vidas se cruzaron y, desde ese momento, todo empezó a cambiar.',
+      p2: 'Lo que, en un principio, iba a ser una vuelta a casa tras un año de transición en Granada dio paso a una nueva vida en otro país. Y donde antes éramos dos, pasamos a ser tres con Julie.',
+      p3: 'Años después llegó Lucas. La familia creció y seguimos construyendo nuestro futuro juntos.',
       closing:
-        'Quince años después, vamos a celebrar todos juntos no solo nuestra unión, sino también todo el camino recorrido.',
+        'Ahora, quince años después, queremos celebrar nuestro amor junto a vosotros.',
       amorSvg: 'el amor.',
     },
     preboda: {
