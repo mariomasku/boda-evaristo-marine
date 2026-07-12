@@ -225,71 +225,11 @@ import SectionTitle from './SectionTitle.astro';
     margin: 0.5rem 0 0;
   }
 
-  /* ── Mapa (mismo estilo que Details.astro) ── */
-  .map-wrapper {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto 5rem;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 24px color-mix(in srgb, var(--sombra) 10%, transparent);
-  }
-
-  .map-label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.8rem 1rem;
-    background: var(--crema);
-    border-top: 2px solid var(--oro);
-    font-family: 'Lato', sans-serif;
-    font-size: 0.85rem;
-    color: var(--eucalipto);
-  }
-
-  .map-open-link {
-    color: var(--salvia);
-    text-decoration: none;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    transition: color 0.2s;
-  }
-
-  .map-open-link:hover { color: var(--eucalipto); }
-
-  .map-wrapper iframe {
-    display: block;
-    filter: grayscale(20%) contrast(1.05);
-  }
+  /* El estilo del mapa ("Cómo llegar") vive en src/styles/global.css,
+     compartido con Details.astro — no duplicar aquí. */
 
   @media (max-width: 480px) {
     .preboda-icon-wrap { width: 100px; height: 100px; }
     .preboda-icon { width: 60px; height: 60px; }
-
-    /* Mapa circular en móvil */
-    .map-wrapper {
-      box-shadow: none;
-      border-radius: 0;
-      overflow: visible;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: transparent;
-      margin-bottom: 3rem;
-    }
-    .map-label {
-      flex-direction: column;
-      gap: 0.4rem;
-      text-align: center;
-      border-top: none;
-      background: transparent;
-      padding: 0 0 1.2rem;
-    }
-    .map-wrapper iframe {
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      box-shadow: 0 6px 24px color-mix(in srgb, var(--sombra) 18%, transparent);
-    }
   }
 </style>
