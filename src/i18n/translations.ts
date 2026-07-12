@@ -3,7 +3,7 @@ export type Lang = 'es' | 'fr';
 export const translations = {
   es: {
     common: {
-      title: 'Marine & Evaristo · 02.10.2026',
+      title: 'Marine & Evaristo José · 02.10.2026',
       metaDescription:
         'Os invitamos a celebrar con nosotros el día más especial de nuestras vidas. Marine & Evaristo, 2 de octubre de 2026.',
     },
@@ -239,7 +239,7 @@ export const translations = {
   },
   fr: {
     common: {
-      title: 'Marine & Evaristo · 02.10.2026',
+      title: 'Marine & Evaristo José · 02.10.2026',
       metaDescription:
         'Nous vous invitons à célébrer avec nous le jour le plus spécial de notre vie. Marine & Evaristo, le 2 octobre 2026.',
     },
