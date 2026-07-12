@@ -265,6 +265,31 @@ import SectionTitle from './SectionTitle.astro';
   @media (max-width: 480px) {
     .preboda-icon-wrap { width: 100px; height: 100px; }
     .preboda-icon { width: 60px; height: 60px; }
-    .map-label { flex-direction: column; gap: 0.4rem; text-align: center; }
+
+    /* Mapa circular en móvil */
+    .map-wrapper {
+      box-shadow: none;
+      border-radius: 0;
+      overflow: visible;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: transparent;
+      margin-bottom: 3rem;
+    }
+    .map-label {
+      flex-direction: column;
+      gap: 0.4rem;
+      text-align: center;
+      border-top: none;
+      background: transparent;
+      padding: 0 0 1.2rem;
+    }
+    .map-wrapper iframe {
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      box-shadow: 0 6px 24px color-mix(in srgb, var(--sombra) 18%, transparent);
+    }
   }
 </style>
