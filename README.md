@@ -2,7 +2,7 @@
 
 Web de invitación para la boda de **Marine y Evaristo**, el **viernes 2 de octubre de 2026** en **Finca El Capricho** (Alcolea, Córdoba).
 
-**Producción**: [boda-evaristo-marine.vercel.app](https://boda-evaristo-marine.vercel.app)
+**Producción**: [bodapilabrandon.vercel.app](https://bodapilabrandon.vercel.app)
 
 ---
 

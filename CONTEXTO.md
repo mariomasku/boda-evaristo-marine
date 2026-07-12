@@ -15,9 +15,9 @@ Web de boda para **Marine y Evaristo (José)**, con **dos días de celebración*
 La web es **multiidioma (español/francés)** con selector de bandera y detección automática del idioma del navegador — ver §4.
 
 - **Tema de diseño**: Mint (paleta "hojas" + distribución de landing de una sola página — ver tabla de temas en `NUEVA-BODA-SETUP.md` §0)
-- **URL de producción**: https://boda-evaristo-marine.vercel.app (sin dominio propio de momento)
-- **Repositorio**: https://github.com/mariomasku/boda-evaristo-marine
-- **Hosting**: Vercel (proyecto `boda-evaristo-marine`, cuenta mariomascu.recursos@gmail.com)
+- **URL de producción**: https://bodapilabrandon.vercel.app (sin dominio propio de momento)
+- **Repositorio**: https://github.com/mariomasku/boda-evaristo-marine (el repo de GitHub conserva su nombre original; solo se renombró el proyecto de Vercel/dominio)
+- **Hosting**: Vercel (proyecto `bodapilabrandon`, cuenta mariomascu.recursos@gmail.com)
 - **Deploy automático**: push a `main` → Vercel despliega. Si el webhook falla, `npx vercel --prod`.
 
 Este proyecto se creó duplicando `boda-isabel-marcos` como plantilla (mismo stack, mismos componentes) y personalizando el contenido. Desde entonces ha recibido bastantes más cambios que la plantilla original (i18n, segundo día de preboda, ajustes responsive) — ver el resto de este documento.
@@ -106,6 +106,6 @@ A petición de los novios, mientras no tengan el horario definitivo de los autoc
 - [ ] Confirmar horario de autocares de vuelta y restaurarlos (ver §6)
 - [ ] Sustituir/ampliar fotos de la pareja cuando lleguen más (de momento solo `Foto01.webp`/`Foto01responsive.webp`)
 - [ ] Fotógrafo: añadir tarjeta de contacto en `RSVP.astro` si finalmente se contrata uno
-- [ ] Revisar si conviene comprar dominio propio (de momento solo `boda-evaristo-marine.vercel.app`)
+- [ ] Revisar si conviene comprar dominio propio (de momento solo `bodapilabrandon.vercel.app`)
 
 Para el resto de detalles técnicos generales (stack, animaciones GSAP, problemas resueltos de la plantilla base), ver el documento CONTEXTO.md del proyecto plantilla `boda-isabel-marcos`: la arquitectura es la misma, salvo por todo lo descrito en este documento (i18n, segundo día de preboda, ajustes responsive) que `boda-isabel-marcos` no tiene.

@@ -3,14 +3,22 @@ interface Props {
   foto: string;
   fotoMobile?: string;
   height?: string;
+  heightMobile?: string;
+  bgPosition?: string;
+  parallaxAmplitude?: number;
   id?: string;
 }
-const { foto, fotoMobile, height = '55vh', id = '' } = Astro.props;
+const { foto, fotoMobile, height = '55vh', heightMobile, bgPosition = 'center', parallaxAmplitude = 15, id = '' } = Astro.props;
 ---
-<div class="parallax-section" style={`height: ${height}`} id={id}>
+<div
+  class="parallax-section"
+  style={`--h: ${height}; ${heightMobile ? `--h-mobile: ${heightMobile};` : ''}`}
+  data-amp={parallaxAmplitude}
+  id={id}
+>
   <div
     class="parallax-bg"
-    style={`--bg: url('${foto}'); ${fotoMobile ? `--bg-mobile: url('${fotoMobile}');` : ''}`}
+    style={`--bg: url('${foto}'); --bg-pos: ${bgPosition}; ${fotoMobile ? `--bg-mobile: url('${fotoMobile}');` : ''}`}
   ></div>
   <div class="parallax-overlay"></div>
 </div>
@@ -20,6 +28,13 @@ const { foto, fotoMobile, height = '55vh', id = '' } = Astro.props;
     position: relative;
     overflow: hidden;
     width: 100%;
+    height: var(--h);
+  }
+
+  @media (max-width: 480px) {
+    .parallax-section {
+      height: var(--h-mobile, var(--h));
+    }
   }
 
   .parallax-bg {
@@ -27,7 +42,7 @@ const { foto, fotoMobile, height = '55vh', id = '' } = Astro.props;
     inset: -20% 0;
     background-image: var(--bg);
     background-size: cover;
-    background-position: center;
+    background-position: var(--bg-pos, center);
     will-change: transform;
   }
 
