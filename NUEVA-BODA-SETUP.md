@@ -60,6 +60,7 @@ Una web de invitación de boda de una sola página (landing scroll) con:
 - Sección de autobús con horarios
 - Formulario de confirmación (RSVP) que escribe en un Google Sheet
 - Panel privado (`/dashboard`) con estadísticas en vivo para los novios, protegido con contraseña simple
+- Página privada **`/mesas`** (accesible desde el panel) para organizar el *seating*: asignar invitados a mesas, con mesa nupcial aparte, nombres de mesa, buscador y edición (ver §7bis y [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md))
 - Footer con acceso al panel
 - Opcionalmente, **multiidioma con selector de bandera** (ver §7) — hay que decidirlo *antes* de escribir el contenido
 
@@ -141,6 +142,7 @@ Las tipografías se cargan por `@import url(...)` en `src/styles/global.css` des
 - [ ] **Contenido**: sustituir todos los datos de la boda anterior (ver §6 — checklist de personalización), ya en el idioma o idiomas decididos en el primer punto
 - [ ] **Fotos**: sustituir `public/fotos/*.webp` y ajustar referencias en `Hero.astro` / `PhotoParallax` en `index.astro`
 - [ ] **Credenciales del panel privado**: cambiar usuarios/contraseña en `Footer.astro` y `dashboard.astro` (ver §6)
+- [ ] **Distribución de mesas (`/mesas`)**: copiar la funcionalidad de seating (ver §7bis y [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md)); solo hay que ajustar el token de auth y el nombre de la pareja
 - [ ] Probar en local (`npx astro dev --background`), enviar un RSVP de prueba y comprobar que aparece en el Sheet y en `/dashboard`
 - [ ] Deploy: push a `master` (o `npx vercel --prod` si el webhook no dispara)
 
@@ -257,6 +259,33 @@ Sistema de traducción 100% en cliente, sin librería externa (no el i18n de Ast
 
 ---
 
+## 7bis. Distribución de invitados por mesas (`/mesas`)
+
+Herramienta de *seating* para los novios: una página privada **`/mesas`** (enlazada desde el panel
+`/dashboard`) que permite asignar cada invitado confirmado a una mesa, con **mesa nupcial aparte**,
+mesas numeradas desde la 1 con nombre temático opcional, buscador de invitados, y CRUD completo
+(crear/editar/eliminar). Persiste en el propio Google Sheet: una columna nueva `MESA` en la pestaña
+`RSVP` y una pestaña nueva `MESAS` para los nombres. **No toca `api/rsvp.ts` ni `api/stats.ts`**: es
+una feature aislada y portable.
+
+**El detalle completo (modelo de datos, endpoints, UI, i18n, cómo replicarla y cómo probarla) está en
+un documento propio: [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md).**
+
+Para una boda nueva, replicarla es copiar 2 ficheros y añadir traducciones:
+1. Copiar `src/pages/api/mesas.ts` (tal cual — usa las mismas variables de entorno).
+2. Copiar `src/pages/mesas.astro` y ajustar el **token de auth** del guard (`sessionStorage 'boda_auth'`,
+   §6) y el nombre de la pareja del header.
+3. Copiar la sección `mesas` de `translations.ts` a todos los idiomas + las claves
+   `dashboard.sectionMesas` / `dashboard.verMesas`.
+4. Añadir en `dashboard.astro` la sección de acceso a `/mesas`.
+5. Nada que preparar en el Sheet: la columna `MESA` y la pestaña `MESAS` se crean solas la primera vez
+   que se guarda una mesa.
+
+> Si la web es multiidioma, esta funcionalidad también debe traducirse desde el principio (todos sus
+> textos, incluidos los generados por JS, ya pasan por `t()`/`tn()` — encaja con la checklist de §7).
+
+---
+
 ## 8. Cómo funciona la integración con Google Sheets (resumen técnico)
 
 ### `src/pages/api/rsvp.ts` (POST, escritura)
@@ -275,6 +304,10 @@ Sistema de traducción 100% en cliente, sin librería externa (no el i18n de Ast
 - Lee `RSVP!A2:M` y calcula en JavaScript (no en fórmulas) las estadísticas: confirmados, adultos, niños, no asisten, plazas de bus ida/vuelta, intolerancias con listado de personas, bebidas.
 - Si la web es multiidioma, cada elemento traducible (alérgenos, bebidas) debe llevar además una `key` estable para que el dashboard la traduzca sin tocar este fichero (ver §7).
 - Devuelve también `sheetUrl` (enlace directo al documento) construido a partir de `GOOGLE_SHEET_ID`.
+
+### `src/pages/api/mesas.ts` (GET/POST, usado por `/mesas`)
+- Gestiona **aparte** la funcionalidad de seating (§7bis): la columna `MESA` de la pestaña `RSVP` y la
+  pestaña `MESAS`. `rsvp.ts` y `stats.ts` no la conocen ni la tocan. Detalle en [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md).
 
 ---
 

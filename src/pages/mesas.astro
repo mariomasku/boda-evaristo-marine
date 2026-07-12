@@ -1,0 +1,625 @@
+---
+export const prerender = true;
+import '../styles/global.css';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+---
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mesas · Marine & Evaristo José</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --border:      color-mix(in srgb, var(--oro) 28%, transparent);
+      --text-soft:   color-mix(in srgb, var(--sombra) 55%, transparent);
+      --card-shadow: 0 1px 3px color-mix(in srgb, var(--sombra) 6%, transparent), 0 4px 12px color-mix(in srgb, var(--sombra) 4%, transparent);
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--marfil);
+      min-height: 100vh;
+      color: var(--eucalipto);
+    }
+
+    /* ── Header (idéntico al dashboard) ── */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--eucalipto);
+      border-bottom: 2px solid var(--oro);
+    }
+    .dash-logo-wrap { display: flex; flex-direction: column; gap: 2px; }
+    .dash-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-style: italic; color: var(--oro); }
+    .dash-logo-sub {
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--oro) 50%, transparent);
+    }
+    .dash-actions { display: flex; gap: 0.6rem; align-items: center; }
+    .btn-ghost {
+      padding: 0.4rem 0.9rem;
+      border: 1px solid color-mix(in srgb, var(--oro) 35%, transparent);
+      background: transparent;
+      color: color-mix(in srgb, var(--oro) 70%, transparent);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-ghost:hover { background: color-mix(in srgb, var(--oro) 12%, transparent); color: var(--oro); }
+    .btn-back-full { display: inline; }
+    .btn-back-short { display: none; }
+
+    /* ── Main ── */
+    .dash-main { max-width: 780px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    .dash-page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 400; font-style: italic; color: var(--eucalipto); margin-bottom: 0.2rem;
+    }
+    .dash-page-sub {
+      font-size: 0.68rem; letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--text-soft); margin-bottom: 2rem;
+    }
+    #m-loading, #m-error { text-align: center; padding: 3rem; color: var(--text-soft); font-size: 0.9rem; }
+    #m-error { color: #b91c1c; }
+
+    /* ── Buscador global ── */
+    .search-box { position: relative; margin-bottom: 1.25rem; }
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--blanco);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      color: var(--eucalipto);
+      box-shadow: var(--card-shadow);
+    }
+    .search-input:focus { outline: none; border-color: var(--oro); }
+    .search-results { margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem; }
+    .search-result {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+      padding: 0.55rem 0.85rem;
+      background: var(--blanco);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: 0.82rem;
+    }
+    .search-result .sr-name { color: var(--eucalipto); }
+    .search-result .sr-table { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--salvia); font-weight: 700; flex-shrink: 0; }
+    .search-result .sr-table.none { color: color-mix(in srgb, var(--sombra) 35%, transparent); font-weight: 400; }
+    .search-hint { font-size: 0.78rem; color: var(--text-soft); padding: 0.4rem 0.2rem; }
+
+    /* ── Cabecera de sección ── */
+    .m-section { margin-bottom: 2rem; }
+    .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .section-label {
+      font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--salvia); font-weight: 700;
+    }
+    .section-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── Botón crear ── */
+    .btn-create {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.7rem 1.3rem;
+      background: var(--eucalipto);
+      color: var(--oro);
+      border: 1px solid var(--eucalipto);
+      border-radius: 6px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+      box-shadow: var(--card-shadow);
+    }
+    .btn-create:hover { background: var(--eucalipto-medio); color: var(--marfil); }
+
+    /* ── Tarjeta de mesa (acordeón) ── */
+    .mesa-list { display: flex; flex-direction: column; gap: 0.9rem; }
+    .mesa-card {
+      background: var(--blanco);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--oro);
+      border-radius: 6px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+    .mesa-card.nupcial {
+      border-left-width: 4px;
+      border-color: var(--oro);
+      background: color-mix(in srgb, var(--oro) 8%, var(--blanco));
+    }
+    .mesa-head {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.85rem 1.1rem;
+      cursor: pointer;
+      width: 100%;
+      background: transparent;
+      border: none;
+      text-align: left;
+      font-family: inherit;
+    }
+    .mesa-head:hover { background: color-mix(in srgb, var(--oro) 6%, transparent); }
+    .mesa-chevron { flex-shrink: 0; color: var(--salvia); transition: transform 0.2s; }
+    .mesa-card.open .mesa-chevron { transform: rotate(90deg); }
+    .mesa-head-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .mesa-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--eucalipto); line-height: 1.2; }
+    .mesa-title .mesa-num { font-style: italic; color: var(--salvia); }
+    .mesa-count { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-soft); }
+    .mesa-actions { display: flex; gap: 0.3rem; flex-shrink: 0; }
+    .icon-btn {
+      background: var(--blanco);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--salvia);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .icon-btn:hover { background: color-mix(in srgb, var(--oro) 12%, transparent); color: var(--eucalipto); border-color: var(--oro); }
+    .icon-btn.danger:hover { background: color-mix(in srgb, #b91c1c 10%, transparent); color: #b91c1c; border-color: color-mix(in srgb, #b91c1c 40%, transparent); }
+
+    .mesa-people { display: none; padding: 0 1.1rem 1rem; flex-direction: column; gap: 0.4rem; }
+    .mesa-card.open .mesa-people { display: flex; }
+    .mesa-person {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+      padding: 0.5rem 0.8rem;
+      background: color-mix(in srgb, var(--oro) 7%, transparent);
+      border: 1px solid color-mix(in srgb, var(--oro) 18%, transparent);
+      border-radius: 5px;
+      font-size: 0.82rem; color: var(--eucalipto);
+    }
+    .mesa-person .p-tag {
+      font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--sombra) 40%, transparent); flex-shrink: 0;
+    }
+    .mesa-empty { font-size: 0.8rem; color: var(--text-soft); padding: 0.3rem 0.2rem; }
+
+    /* ── Modal de selección ── */
+    .sel-overlay {
+      position: fixed; inset: 0;
+      background: color-mix(in srgb, var(--eucalipto-noche) 55%, transparent);
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+      display: none; align-items: center; justify-content: center;
+      z-index: 999; padding: 1rem; opacity: 0; transition: opacity 0.2s ease;
+    }
+    .sel-overlay.open { opacity: 1; }
+    .sel-modal {
+      background: var(--blanco);
+      border-radius: 8px;
+      border-top: 4px solid var(--oro);
+      box-shadow: 0 20px 60px color-mix(in srgb, var(--sombra) 30%, transparent);
+      max-width: 440px; width: 100%; max-height: 86vh;
+      display: flex; flex-direction: column;
+      transform: translateY(10px); transition: transform 0.22s ease;
+    }
+    .sel-overlay.open .sel-modal { transform: translateY(0); }
+    .sel-header { padding: 1.1rem 1.25rem 0.5rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .sel-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-style: italic; color: var(--eucalipto); }
+    .sel-close { background: transparent; border: none; cursor: pointer; color: var(--text-soft); padding: 0.25rem; line-height: 1; flex-shrink: 0; }
+    .sel-close:hover { color: var(--eucalipto); }
+    .sel-fields { padding: 0.25rem 1.25rem 0.5rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .sel-label { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--salvia); font-weight: 700; }
+    .sel-input {
+      width: 100%; padding: 0.6rem 0.8rem;
+      border: 1px solid var(--border); border-radius: 5px;
+      background: var(--blanco); font-family: 'Lato', sans-serif; font-size: 0.85rem; color: var(--eucalipto);
+    }
+    .sel-input:focus { outline: none; border-color: var(--oro); }
+    .sel-hint { font-size: 0.72rem; color: var(--text-soft); padding: 0 1.25rem; }
+    .sel-guests {
+      overflow-y: auto; padding: 0.6rem 1.25rem 0.5rem;
+      display: flex; flex-wrap: wrap; gap: 0.45rem; align-content: flex-start;
+    }
+    .guest-btn {
+      padding: 0.5rem 0.85rem;
+      border: 1px solid color-mix(in srgb, var(--oro) 30%, transparent);
+      border-radius: 20px;
+      background: var(--blanco);
+      color: var(--eucalipto);
+      font-family: 'Lato', sans-serif; font-size: 0.8rem;
+      cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .guest-btn:hover { border-color: var(--oro); }
+    .guest-btn.selected { background: var(--oro); color: var(--eucalipto); border-color: var(--oro); font-weight: 700; }
+    .guest-btn .g-tag { font-size: 0.62rem; opacity: 0.7; margin-left: 0.3rem; }
+    .sel-empty { font-size: 0.82rem; color: var(--text-soft); padding: 1rem 0.2rem; }
+    .sel-footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.8rem;
+      padding: 0.8rem 1.25rem 1.1rem; border-top: 1px solid var(--border); margin-top: 0.3rem;
+    }
+    .sel-selected-count { font-size: 0.72rem; color: var(--text-soft); }
+    .sel-footer-btns { display: flex; gap: 0.5rem; }
+    .btn-save {
+      padding: 0.6rem 1.4rem;
+      background: var(--eucalipto); color: var(--oro);
+      border: 1px solid var(--eucalipto); border-radius: 6px;
+      font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .btn-save:hover { background: var(--eucalipto-medio); color: var(--marfil); }
+    .btn-save:disabled { opacity: 0.6; cursor: default; }
+    .btn-cancel {
+      padding: 0.6rem 1.1rem; background: transparent;
+      border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text-soft); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer;
+    }
+    .btn-cancel:hover { color: var(--eucalipto); border-color: var(--oro); }
+
+    @media (max-width: 580px) {
+      #logout-btn { display: none; }
+      .btn-back-full { display: none; }
+      .btn-back-short { display: inline; }
+    }
+  </style>
+</head>
+<body data-title-key="mesas.title">
+
+  <header class="dash-header">
+    <div class="dash-logo-wrap">
+      <span class="dash-logo">Marine <span style="font-style:normal;color:color-mix(in srgb, var(--oro) 50%, transparent)">&</span> Evaristo</span>
+      <span class="dash-logo-sub" data-i18n="mesas.pageTitle">Distribución de mesas</span>
+    </div>
+    <div class="dash-actions">
+      <LanguageSwitcher />
+      <a href="/dashboard" class="btn-ghost">
+        <span class="btn-back-full" data-i18n="mesas.backDashboard">← Panel</span>
+        <span class="btn-back-short" data-i18n="mesas.backDashboard">← Panel</span>
+      </a>
+      <button class="btn-ghost" id="logout-btn" data-i18n="dashboard.logout">Salir</button>
+    </div>
+  </header>
+
+  <main class="dash-main">
+    <h1 class="dash-page-title" data-i18n="mesas.pageTitle">Distribución de mesas</h1>
+    <p class="dash-page-sub" data-i18n="mesas.pageSub">Organiza a los invitados confirmados por mesas</p>
+
+    <div id="m-loading" data-i18n="mesas.loading">Cargando invitados…</div>
+    <div id="m-error" style="display:none"></div>
+
+    <div id="m-content" style="display:none">
+      <!-- Buscador global -->
+      <div class="search-box">
+        <input type="text" id="global-search" class="search-input" data-i18n-placeholder="mesas.searchPlaceholder" placeholder="Buscar invitado por nombre…" autocomplete="off" />
+        <div class="search-results" id="search-results"></div>
+      </div>
+
+      <!-- Mesa nupcial -->
+      <div class="m-section" id="nupcial-section"></div>
+
+      <!-- Mesas numeradas -->
+      <div class="m-section">
+        <div class="section-header">
+          <span class="section-label" data-i18n="mesas.sectionTables">Mesas de invitados</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="mesa-list" id="mesa-list" style="margin-bottom:1rem"></div>
+        <button type="button" class="btn-create" id="btn-create-table" data-i18n="mesas.createTable">+ Crear mesa</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de selección de invitados -->
+  <div class="sel-overlay" id="sel-overlay" role="dialog" aria-modal="true">
+    <div class="sel-modal">
+      <div class="sel-header">
+        <p class="sel-title" id="sel-title"></p>
+        <button class="sel-close" id="sel-close" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
+        </button>
+      </div>
+      <div class="sel-fields">
+        <div>
+          <label class="sel-label" for="sel-name" data-i18n="mesas.nameLabel">Nombre de la mesa (opcional)</label>
+          <input type="text" id="sel-name" class="sel-input" data-i18n-placeholder="mesas.namePlaceholder" style="margin-top:0.3rem" autocomplete="off" />
+        </div>
+        <input type="text" id="sel-search" class="sel-input" data-i18n-placeholder="mesas.modalSearchPlaceholder" autocomplete="off" />
+      </div>
+      <p class="sel-hint" id="sel-hint" data-i18n="mesas.selectHint">Pulsa los invitados para sentarlos en esta mesa.</p>
+      <div class="sel-guests" id="sel-guests"></div>
+      <div class="sel-footer">
+        <span class="sel-selected-count" id="sel-count"></span>
+        <div class="sel-footer-btns">
+          <button type="button" class="btn-cancel" id="sel-cancel" data-i18n="mesas.cancel">Cancelar</button>
+          <button type="button" class="btn-save" id="sel-save" data-i18n="mesas.save">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import { t, tn, getCurrentLang } from '../i18n/apply';
+
+    // ── Auth guard ──────────────────────────────────────────────
+    if (sessionStorage.getItem('boda_auth') !== 'boda021026') {
+      window.location.replace('/');
+    }
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+      sessionStorage.removeItem('boda_auth');
+      window.location.href = '/';
+    });
+
+    const NUPCIAL = 'NUPCIAL';
+
+    type Guest = { row: number; nombre: string; rol: string; edad: string; mesa: string | null };
+    type Persona = { row: number; nombre: string; rol: string; edad: string };
+    type Mesa = { id: string; esNupcial: boolean; nombre: string; personas: Persona[] };
+
+    let guests: Guest[] = [];
+    let mesas: Mesa[] = [];
+    const expanded = new Set<string>();   // ids de mesas desplegadas (persiste entre renders)
+
+    const lang = () => getCurrentLang();
+    const isNino = (rol: string) => rol.toUpperCase().startsWith('NIÑO') || rol.toUpperCase().startsWith('NINO');
+    const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
+    const countLabel = (n: number) => tn(lang(), n === 1 ? 'mesas.personOne' : 'mesas.personOther', n);
+    // Título mostrado en la tarjeta/confirmación: "Mesa nupcial", "Mesa N" o "Mesa N — Nombre".
+    const mesaTitle = (m: Mesa) => {
+      if (m.esNupcial) return m.nombre || t(lang(), 'mesas.nupcialName');
+      const base = `${t(lang(), 'mesas.tableWord')} ${m.id}`;
+      return m.nombre ? `${base} — ${m.nombre}` : base;
+    };
+
+    // ── Carga de datos ──────────────────────────────────────────
+    async function loadData() {
+      try {
+        const res  = await fetch('/api/mesas');
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error ?? t(lang(), 'mesas.unknownError'));
+        guests = data.guests;
+        mesas  = data.mesas;
+        document.getElementById('m-loading')!.style.display = 'none';
+        document.getElementById('m-content')!.style.display = 'block';
+        render();
+      } catch (err) {
+        document.getElementById('m-loading')!.style.display = 'none';
+        const errEl = document.getElementById('m-error')!;
+        errEl.style.display = 'block';
+        errEl.textContent = t(lang(), 'mesas.loadError') + (err instanceof Error ? err.message : String(err));
+      }
+    }
+
+    // ── Render principal ────────────────────────────────────────
+    function render() {
+      renderNupcial();
+      renderTables();
+      renderSearch();
+    }
+
+    function personRowHtml(p: Persona) {
+      const tag = isNino(p.rol)
+        ? `<span class="p-tag">${p.edad ? esc(p.edad) + t(lang(), 'dashboard.ageSuffix') : t(lang(), 'mesas.ninoTag')}</span>`
+        : '';
+      return `<div class="mesa-person">${esc(p.nombre)}${tag}</div>`;
+    }
+
+    function mesaCardHtml(m: Mesa) {
+      const open = expanded.has(m.id) ? ' open' : '';
+      const people = m.personas.length
+        ? m.personas.map(personRowHtml).join('')
+        : `<div class="mesa-empty">${t(lang(), 'mesas.emptyTable')}</div>`;
+      // Título con el número en cursiva destacado para las mesas numeradas.
+      let titleHtml: string;
+      if (m.esNupcial) {
+        titleHtml = esc(m.nombre || t(lang(), 'mesas.nupcialName'));
+      } else {
+        const num = `<span class="mesa-num">${t(lang(),'mesas.tableWord')} ${esc(m.id)}</span>`;
+        titleHtml = m.nombre ? `${num} · ${esc(m.nombre)}` : num;
+      }
+      return `<div class="mesa-card${m.esNupcial ? ' nupcial' : ''}${open}" data-id="${esc(m.id)}">
+        <button type="button" class="mesa-head" data-toggle="${esc(m.id)}">
+          <svg class="mesa-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2l4 4-4 4"/></svg>
+          <span class="mesa-head-body">
+            <span class="mesa-title">${titleHtml}</span>
+            <span class="mesa-count">${countLabel(m.personas.length)}</span>
+          </span>
+          <span class="mesa-actions">
+            <span class="icon-btn" role="button" tabindex="0" data-edit="${esc(m.id)}" title="${t(lang(),'mesas.edit')}" aria-label="${t(lang(),'mesas.edit')}">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 2.5l2 2L6 12l-3 1 1-3 7.5-7.5z"/></svg>
+            </span>
+            <span class="icon-btn danger" role="button" tabindex="0" data-delete="${esc(m.id)}" title="${t(lang(),'mesas.delete')}" aria-label="${t(lang(),'mesas.delete')}">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h10M6 4V2.5h4V4M4.5 4l.5 9h6l.5-9"/></svg>
+            </span>
+          </span>
+        </button>
+        <div class="mesa-people">${people}</div>
+      </div>`;
+    }
+
+    function renderNupcial() {
+      const sec = document.getElementById('nupcial-section')!;
+      const nupcial = mesas.find(m => m.esNupcial);
+      if (nupcial) {
+        sec.innerHTML = mesaCardHtml(nupcial);
+      } else {
+        sec.innerHTML = `<button type="button" class="btn-create" id="btn-create-nupcial" data-i18n="mesas.createNupcial">${t(lang(),'mesas.createNupcial')}</button>`;
+        document.getElementById('btn-create-nupcial')!.addEventListener('click', () => openModal(NUPCIAL));
+      }
+    }
+
+    function renderTables() {
+      const list = document.getElementById('mesa-list')!;
+      const numeradas = mesas.filter(m => !m.esNupcial);
+      list.innerHTML = numeradas.map(mesaCardHtml).join('');
+    }
+
+    // Delegación de eventos para acordeón + editar + eliminar
+    document.getElementById('m-content')!.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const editEl = target.closest('[data-edit]') as HTMLElement | null;
+      if (editEl) { e.stopPropagation(); openModal(editEl.dataset.edit!); return; }
+      const delEl = target.closest('[data-delete]') as HTMLElement | null;
+      if (delEl) { e.stopPropagation(); deleteMesa(delEl.dataset.delete!); return; }
+      const toggleEl = target.closest('[data-toggle]') as HTMLElement | null;
+      if (toggleEl) {
+        const id = toggleEl.dataset.toggle!;
+        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+        toggleEl.closest('.mesa-card')!.classList.toggle('open');
+      }
+    });
+
+    document.getElementById('btn-create-table')!.addEventListener('click', () => openModal(null));
+
+    // ── Buscador global ─────────────────────────────────────────
+    const searchInput = document.getElementById('global-search') as HTMLInputElement;
+    searchInput.addEventListener('input', renderSearch);
+
+    function renderSearch() {
+      const box = document.getElementById('search-results')!;
+      const q = searchInput.value.trim().toLowerCase();
+      if (!q) { box.innerHTML = ''; return; }
+      const matches = guests.filter(g => g.nombre.toLowerCase().includes(q));
+      if (!matches.length) { box.innerHTML = `<p class="search-hint">${t(lang(),'mesas.searchNoMatch')}</p>`; return; }
+      box.innerHTML = matches.map(g => {
+        let label: string, cls = 'sr-table';
+        if (!g.mesa) { label = t(lang(),'mesas.unassigned'); cls += ' none'; }
+        else if (g.mesa.toUpperCase() === NUPCIAL) { label = t(lang(),'mesas.nupcialName'); }
+        else { label = `${t(lang(),'mesas.tableWord')} ${g.mesa}`; }
+        return `<div class="search-result"><span class="sr-name">${esc(g.nombre)}</span><span class="${cls}">${label}</span></div>`;
+      }).join('');
+    }
+
+    // ── Modal de selección ──────────────────────────────────────
+    const overlay = document.getElementById('sel-overlay') as HTMLElement;
+    const selName   = document.getElementById('sel-name') as HTMLInputElement;
+    const selSearch = document.getElementById('sel-search') as HTMLInputElement;
+    const selGuests = document.getElementById('sel-guests') as HTMLElement;
+    const selSave   = document.getElementById('sel-save') as HTMLButtonElement;
+
+    let modalId: string | null = null;       // id de la mesa (o NUPCIAL); null = nueva numerada
+    let modalIsNupcial = false;
+    const selected = new Set<number>();       // filas seleccionadas
+
+    function nextTableId(): string {
+      const nums = mesas.filter(m => !m.esNupcial).map(m => parseInt(m.id, 10)).filter(n => !isNaN(n));
+      return String((nums.length ? Math.max(...nums) : 0) + 1);
+    }
+
+    function openModal(id: string | null) {
+      modalIsNupcial = id === NUPCIAL;
+      const existing = id ? mesas.find(m => m.id === id) : undefined;
+      modalId = existing ? existing.id : (modalIsNupcial ? NUPCIAL : nextTableId());
+
+      // Título
+      let title: string;
+      if (existing) title = t(lang(),'mesas.modalEditTable') + (existing.esNupcial ? '' : ` · ${t(lang(),'mesas.tableWord')} ${existing.id}`);
+      else if (modalIsNupcial) title = t(lang(),'mesas.modalNewNupcial');
+      else title = `${t(lang(),'mesas.modalNewTable')} · ${t(lang(),'mesas.tableWord')} ${modalId}`;
+      document.getElementById('sel-title')!.textContent = title;
+
+      // Nombre (nupcial pre-rellena el nombre por defecto)
+      selName.value = existing ? existing.nombre : (modalIsNupcial ? t(lang(),'mesas.nupcialName') : '');
+      selSearch.value = '';
+
+      // Selección inicial: filas ya en esta mesa
+      selected.clear();
+      if (existing) existing.personas.forEach(p => selected.add(p.row));
+
+      renderModalGuests();
+      overlay.style.display = 'flex';
+      overlay.getBoundingClientRect();
+      overlay.classList.add('open');
+    }
+
+    function renderModalGuests() {
+      // Disponibles: sin mesa + los que ya están en ESTA mesa (para poder quitarlos)
+      const q = selSearch.value.trim().toLowerCase();
+      const available = guests.filter(g => (!g.mesa || g.mesa === modalId));
+      const filtered = q ? available.filter(g => g.nombre.toLowerCase().includes(q)) : available;
+      if (!filtered.length) {
+        selGuests.innerHTML = `<p class="sel-empty">${t(lang(), q ? 'mesas.searchNoMatch' : 'mesas.noAvailable')}</p>`;
+      } else {
+        selGuests.innerHTML = filtered.map(g => {
+          const sel = selected.has(g.row) ? ' selected' : '';
+          const tag = isNino(g.rol) ? `<span class="g-tag">${t(lang(),'mesas.ninoTag')}</span>` : '';
+          return `<button type="button" class="guest-btn${sel}" data-row="${g.row}">${esc(g.nombre)}${tag}</button>`;
+        }).join('');
+      }
+      updateSelCount();
+    }
+
+    function updateSelCount() {
+      document.getElementById('sel-count')!.textContent = tn(lang(), 'mesas.selectedCount', selected.size);
+    }
+
+    selGuests.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.guest-btn') as HTMLElement | null;
+      if (!btn) return;
+      const row = Number(btn.dataset.row);
+      if (selected.has(row)) selected.delete(row); else selected.add(row);
+      btn.classList.toggle('selected');
+      updateSelCount();
+    });
+
+    selSearch.addEventListener('input', renderModalGuests);
+
+    function closeModal() {
+      overlay.classList.remove('open');
+      overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
+    }
+    document.getElementById('sel-close')!.addEventListener('click', closeModal);
+    document.getElementById('sel-cancel')!.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal(); });
+
+    selSave.addEventListener('click', async () => {
+      selSave.disabled = true;
+      const original = selSave.textContent;
+      selSave.textContent = t(lang(), 'mesas.savingLabel');
+      try {
+        const res = await fetch('/api/mesas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save', id: modalId, nombre: selName.value.trim(), rows: [...selected] }),
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error ?? '');
+        if (modalId) expanded.add(modalId);
+        closeModal();
+        await loadData();
+      } catch (err) {
+        alert(t(lang(), 'mesas.saveError'));
+      } finally {
+        selSave.disabled = false;
+        selSave.textContent = original;
+      }
+    });
+
+    async function deleteMesa(id: string) {
+      const m = mesas.find(x => x.id === id);
+      const name = m ? mesaTitle(m) : id;
+      if (!confirm(t(lang(), 'mesas.deleteConfirm').replace('{name}', name))) return;
+      try {
+        const res = await fetch('/api/mesas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete', id }),
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error ?? '');
+        expanded.delete(id);
+        await loadData();
+      } catch {
+        alert(t(lang(), 'mesas.saveError'));
+      }
+    }
+
+    loadData();
+
+    // Al cambiar de idioma, repinta con los datos ya cargados
+    window.addEventListener('langchange', () => {
+      if (guests.length || mesas.length) { render(); }
+    });
+  </script>
+</body>
+</html>

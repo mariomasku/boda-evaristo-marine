@@ -415,6 +415,21 @@ import LanguageSwitcher from '../components/LanguageSwitcher.astro';
     <div id="dash-error" style="display:none"></div>
     <div id="dash-content" style="display:none">
 
+      <!-- Acceso a la distribución de mesas -->
+      <div class="dash-section">
+        <div class="section-header">
+          <span class="section-label" data-i18n="dashboard.sectionMesas">Distribución de mesas</span>
+          <div class="section-line"></div>
+        </div>
+        <a class="sheet-link" href="/mesas" style="display:flex;justify-content:center;width:100%">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="8" cy="6" r="3.2"/>
+            <path d="M2.5 14c0-2.2 2.5-3.6 5.5-3.6s5.5 1.4 5.5 3.6"/>
+          </svg>
+          <span data-i18n="dashboard.verMesas">Organizar mesas →</span>
+        </a>
+      </div>
+
       <!-- Asistencia -->
       <div class="dash-section">
         <div class="section-header">
