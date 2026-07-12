@@ -153,14 +153,5 @@ Ni el Sheet ni las hojas necesitan prepararse a mano: la primera vez que llega u
 
 ---
 
-## Estado del proyecto
-
-El proyecto está prácticamente terminado y en producción. Pendientes menores a revisar antes de la entrega final:
-
-- [x] Retirar el campo `debug` de la respuesta de error de `/api/rsvp` (ahora solo se registra en los logs del servidor)
-- [ ] Borrar los registros de prueba del Google Sheet real antes de compartirlo con los invitados
-- [ ] Probar el flujo completo del formulario y el botón de calendario en un dispositivo real (iOS y Android)
-
----
 
 *Desarrollo: [maskudev](https://github.com/mariomasku)*
