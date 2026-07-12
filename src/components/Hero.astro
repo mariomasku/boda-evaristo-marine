@@ -1,7 +1,7 @@
 ---
 ---
 <section id="hero" class="hero-section">
-  <div class="hero-bg parallax-hero-bg" style="background-image: url('/fotos/Foto01.webp')"></div>
+  <div class="hero-bg parallax-hero-bg" style="--bg: url('/fotos/Foto01.webp'); --bg-mobile: url('/fotos/Foto01responsive.webp')"></div>
   <div class="hero-overlay"></div>
   <div class="hero-top">
     <p class="hero-pre gsap-hero" data-i18n="hero.pretitle">nos casamos</p>
@@ -92,9 +92,16 @@
   .hero-bg {
     position: absolute;
     inset: -20% 0;
+    background-image: var(--bg);
     background-size: cover;
     background-position: center;
     will-change: transform;
+  }
+
+  @media (max-width: 480px) {
+    .hero-bg {
+      background-image: var(--bg-mobile, var(--bg));
+    }
   }
 
   .hero-overlay {
