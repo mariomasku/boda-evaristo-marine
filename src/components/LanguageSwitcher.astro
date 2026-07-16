@@ -29,12 +29,15 @@
 </style>
 
 <script>
-  import { applyLang, type Lang } from '../i18n/apply';
+  import type { Lang } from '../i18n/engine';
 
+  // No importa `apply`/`apply.admin` directamente: este componente se reutiliza en
+  // la web pública y en el panel privado, cada una con su propio diccionario. Solo
+  // dispara el evento; la instancia de i18n cargada en cada página lo escucha.
   document.querySelectorAll<HTMLButtonElement>('.lang-flag').forEach((btn) => {
     btn.addEventListener('click', () => {
       const lang = btn.dataset.lang as Lang;
-      applyLang(lang);
+      window.dispatchEvent(new CustomEvent('lang-switch-request', { detail: { lang } }));
     });
   });
 </script>
