@@ -13,6 +13,16 @@ const HEADERS = [
   'CANCIÓN', 'COMENTARIOS', 'PREBODA',
 ];
 
+// Columna EMAIL: se gestiona aparte (como MESA en mesas.ts) porque la columna O
+// ya está ocupada por MESA en producción; no se puede meter dentro de HEADERS
+// sin desplazar esa columna y perder las asignaciones de mesa ya guardadas.
+const EMAIL_COL   = 'P';
+const EMAIL_HEADER = 'EMAIL';
+
+// Nº total de columnas de la pestaña RSVP incluyendo MESA (O, de mesas.ts) y EMAIL (P),
+// usado para colorear filas y autoajustar anchos hasta la última columna real.
+const RSVP_TOTAL_COLS = 16;
+
 // Convierte un hex "rrggbb" al formato RGB 0-1 que usa la API de Sheets.
 const rgb = (hex: string) => ({
   red:   parseInt(hex.slice(0, 2), 16) / 255,
@@ -134,6 +144,33 @@ async function ensureSetup(
     requestBody: { values: [HEADERS] },
   });
 
+  // Cabecera de la columna EMAIL (columna aparte, no toca las de HEADERS ni la MESA de mesas.ts).
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `${RSVP_TAB}!${EMAIL_COL}1`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [[EMAIL_HEADER]] },
+  });
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: [{
+        repeatCell: {
+          range: { sheetId: rsvpId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 15, endColumnIndex: 16 },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: EUCALIPTO,
+              textFormat: { foregroundColor: OLIVA, bold: true, fontSize: 9 },
+              horizontalAlignment: 'CENTER',
+              verticalAlignment: 'MIDDLE',
+            },
+          },
+          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)',
+        },
+      }],
+    },
+  });
+
   // Siempre reescribir fórmulas del RESUMEN
   await writeResumen(sheets, spreadsheetId);
 
@@ -152,7 +189,7 @@ async function autoResizeColumns(
     spreadsheetId,
     requestBody: {
       requests: [
-        { autoResizeDimensions: { dimensions: { sheetId: rsvpId, dimension: 'COLUMNS', startIndex: 0, endIndex: HEADERS.length } } },
+        { autoResizeDimensions: { dimensions: { sheetId: rsvpId, dimension: 'COLUMNS', startIndex: 0, endIndex: RSVP_TOTAL_COLS } } },
         { autoResizeDimensions: { dimensions: { sheetId: resId,  dimension: 'COLUMNS', startIndex: 0, endIndex: 2 } } },
       ],
     },
@@ -472,6 +509,26 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { rsvpId: rsvpSheetId, resId: resumenSheetId } = await ensureSetup(sheets, spreadsheetId);
 
+    // ── Comprobar email duplicado ─────────────────────────────
+    const email = String(data.email ?? '').trim();
+    if (email) {
+      const existing = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: `${RSVP_TAB}!${EMAIL_COL}2:${EMAIL_COL}`,
+      });
+      const existingEmails = (existing.data.values ?? []).flat().map(v => String(v).trim().toLowerCase());
+      if (existingEmails.includes(email.toLowerCase())) {
+        return new Response(JSON.stringify({
+          ok: false,
+          code: 'DUPLICATE_EMAIL',
+          error: 'Ese correo ya ha sido registrado como invitado.',
+        }), {
+          status: 409,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     // ── Construir filas ──────────────────────────────────────
     const fecha       = new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' });
     const nombre      = cap(data.nombre);
@@ -527,6 +584,16 @@ export const POST: APIRoute = async ({ request }) => {
     const rowMatch     = updatedRange.match(/[A-Z]+(\d+)/);
     const startRow     = rowMatch ? parseInt(rowMatch[1]) - 1 : 1;
 
+    // ── Guardar email (columna aparte, fila del invitado principal) ──
+    if (email) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `${RSVP_TAB}!${EMAIL_COL}${startRow + 1}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [[email]] },
+      });
+    }
+
     const colorMap: Record<RowType, typeof COLOR_INVITADO> = {
       invitado:    COLOR_INVITADO,
       acompanante: COLOR_ACOMPANANTE,
@@ -535,7 +602,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const colorReqs = rowTypes.map((type, idx) => ({
       repeatCell: {
-        range: { sheetId: rsvpSheetId, startRowIndex: startRow + idx, endRowIndex: startRow + idx + 1, startColumnIndex: 0, endColumnIndex: HEADERS.length },
+        range: { sheetId: rsvpSheetId, startRowIndex: startRow + idx, endRowIndex: startRow + idx + 1, startColumnIndex: 0, endColumnIndex: RSVP_TOTAL_COLS },
         cell: { userEnteredFormat: { backgroundColor: colorMap[type] } },
         fields: 'userEnteredFormat.backgroundColor',
       },

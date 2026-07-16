@@ -127,6 +127,9 @@ export const translations = {
       q11Placeholder: 'Cuéntanos...',
       photoHint:
         'Si tienes pensado hacernos una sorpresa durante la cena, cuéntanoslo aquí para poder organizarlo con calma.',
+      emailLabel: 'Correo electrónico *',
+      emailPlaceholder: 'tucorreo@ejemplo.com',
+      emailDuplicateError: 'Ese correo ya ha sido registrado como invitado.',
       submit: 'Enviar confirmación',
       sending: 'Enviando...',
       formError: 'Algo ha ido mal. Por favor, inténtalo de nuevo o escríbenos directamente.',
@@ -403,6 +406,9 @@ export const translations = {
       q11Placeholder: 'Dis-nous...',
       photoHint:
         "Si tu comptes nous faire une surprise pendant le dîner, dis-le-nous ici pour que nous puissions l'organiser tranquillement.",
+      emailLabel: 'Adresse e-mail *',
+      emailPlaceholder: 'tonemail@exemple.com',
+      emailDuplicateError: 'Cet e-mail a déjà été enregistré comme invité.',
       submit: 'Envoyer la confirmation',
       sending: 'Envoi en cours...',
       formError: "Une erreur s'est produite. Merci de réessayer ou de nous écrire directement.",

@@ -58,7 +58,9 @@ Una web de invitación de boda de una sola página (landing scroll) con:
 - Bienvenida con revelado de texto al hacer scroll
 - Timeline del día + mapa + botón "añadir a calendario"
 - Sección de autobús con horarios
-- Formulario de confirmación (RSVP) que escribe en un Google Sheet
+- Formulario de confirmación (RSVP) que escribe en un Google Sheet, con campo de correo electrónico
+  y comprobación de duplicados para evitar confirmaciones repetidas del mismo invitado (ver §7ter y
+  [`FUNCIONALIDAD-EMAIL-RSVP.md`](./FUNCIONALIDAD-EMAIL-RSVP.md))
 - Panel privado (`/dashboard`) con estadísticas en vivo para los novios, protegido con contraseña simple
 - Página privada **`/mesas`** (accesible desde el panel) para organizar el *seating*: asignar invitados a mesas, con mesa nupcial aparte, nombres de mesa, buscador y edición (ver §7bis y [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md))
 - Footer con acceso al panel
@@ -143,6 +145,7 @@ Las tipografías se cargan por `@import url(...)` en `src/styles/global.css` des
 - [ ] **Fotos**: sustituir `public/fotos/*.webp` y ajustar referencias en `Hero.astro` / `PhotoParallax` en `index.astro`
 - [ ] **Credenciales del panel privado**: cambiar usuarios/contraseña en `Footer.astro` y `dashboard.astro` (ver §6)
 - [ ] **Distribución de mesas (`/mesas`)**: copiar la funcionalidad de seating (ver §7bis y [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md)); solo hay que ajustar el token de auth y el nombre de la pareja
+- [ ] **Email + anti-duplicados en el RSVP**: copiar el campo de email y la comprobación de duplicados (ver §7ter y [`FUNCIONALIDAD-EMAIL-RSVP.md`](./FUNCIONALIDAD-EMAIL-RSVP.md)); decidir primero si esa columna va dentro de `HEADERS` o aparte, según si la boda ya tiene `/mesas`
 - [ ] Probar en local (`npx astro dev --background`), enviar un RSVP de prueba y comprobar que aparece en el Sheet y en `/dashboard`
 - [ ] Deploy: push a `master` (o `npx vercel --prod` si el webhook no dispara)
 
@@ -286,6 +289,25 @@ Para una boda nueva, replicarla es copiar 2 ficheros y añadir traducciones:
 
 ---
 
+## 7ter. Email del invitado + comprobación de duplicados en el RSVP
+
+Campo de **correo electrónico**, obligatorio, al final del formulario de RSVP (fuera del bloque
+condicional de "asistes = Sí", así se pide siempre). Antes de guardar, el backend comprueba si ese
+correo ya existe en la pestaña `RSVP` (sin distinguir mayúsculas ni espacios); si ya está registrado,
+responde `409` y el formulario muestra "Ese correo ya ha sido registrado como invitado." bajo el
+campo, sin escribir una fila nueva. Evita confirmaciones duplicadas del mismo invitado.
+
+**El detalle completo (dónde va la columna EMAIL según si la boda tiene `/mesas` o no, backend,
+frontend, i18n, cómo replicarla y cómo probarla) está en un documento propio:
+[`FUNCIONALIDAD-EMAIL-RSVP.md`](./FUNCIONALIDAD-EMAIL-RSVP.md).**
+
+Punto clave a decidir primero al replicarla: si esa boda **ya tiene** la funcionalidad de mesas
+(§7bis), la columna `O` está ocupada por `MESA` y el email debe ir aparte en la columna `P` (patrón
+idéntico al de `mesas.ts`, sin tocar `HEADERS`). Si **no** la tiene, `O` está libre y el email puede
+añadirse directamente al array `HEADERS` de `rsvp.ts`, más simple.
+
+---
+
 ## 8. Cómo funciona la integración con Google Sheets (resumen técnico)
 
 ### `src/pages/api/rsvp.ts` (POST, escritura)
@@ -295,7 +317,13 @@ Para una boda nueva, replicarla es copiar 2 ficheros y añadir traducciones:
   `FECHA · NOMBRE · ROL · ACOMPAÑANTE DE · ASISTENCIA · EDAD · INTOLERANCIAS · OTROS ALERGENOS · BEBIDA · AUTOBÚS · PLAZAS BUS · CANCIÓN · COMENTARIOS`
 - Cada envío puede generar **varias filas** (invitado + acompañante + niños), coloreadas según el rol con `--salvia-invitado` / `--salvia-acompanante` / `--salvia-ninos`.
 - El coloreado y el formato de cabecera están **acotados a columnas concretas** (A:M en RSVP, A:B en RESUMEN) para no pintar la fila entera de la hoja.
-- `autoResizeColumns()`: ajusta el ancho de columna al contenido tras cada envío.
+- `autoResizeColumns()`: ajusta el ancho de columna al contenido tras cada envío (como mínimo el
+  ancho de la cabecera; crece si el contenido de la celda es más largo). Si la boda tiene columnas
+  añadidas aparte de `HEADERS` (`MESA` de `/mesas`, `EMAIL` de este apartado), el límite de columnas
+  para colorear y autoajustar debe ampliarse para cubrirlas también (ver `RSVP_TOTAL_COLS` en
+  [`FUNCIONALIDAD-EMAIL-RSVP.md`](./FUNCIONALIDAD-EMAIL-RSVP.md)), si no se quedan sin colorear/ajustar.
+- Comprueba duplicados por email antes de guardar (§7ter): detalle en
+  [`FUNCIONALIDAD-EMAIL-RSVP.md`](./FUNCIONALIDAD-EMAIL-RSVP.md).
 - **Importante**: los colores en este fichero están escritos como RGB 0–1 (formato que exige la API de Sheets), no pueden ser `var(--...)`. Hay un helper `rgb('hexsinalmohadilla')` que traduce un hex a ese formato — si cambias la paleta de `global.css`, tienes que replicar el cambio aquí a mano.
 - Fórmulas de `RESUMEN` en español (`;` como separador de argumentos, no `,`) porque el Sheet está en locale español.
 - Los valores que se escriben en el Sheet (asistencia, autobús, etc.) son siempre los `value` fijos del formulario (ver §7 sobre qué no se traduce), independientemente del idioma en que el invitado haya visto la web.
@@ -350,3 +378,5 @@ npx vercel logs <deployment-url> --since 1h
 
 - Historial técnico y decisiones de la boda de este repositorio: [`CONTEXTO.md`](./CONTEXTO.md)
 - Instrucciones de desarrollo del repo: [`CLAUDE.md`](./CLAUDE.md)
+- Funcionalidad de mesas (seating): [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md)
+- Funcionalidad de email + anti-duplicados del RSVP: [`FUNCIONALIDAD-EMAIL-RSVP.md`](./FUNCIONALIDAD-EMAIL-RSVP.md)

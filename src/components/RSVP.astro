@@ -194,6 +194,13 @@ import SectionTitle from './SectionTitle.astro';
 
       </div><!-- /#extras-si -->
 
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" data-i18n="rsvp.emailLabel">Correo electrónico *</label>
+        <input type="email" id="email" name="email" required placeholder="tucorreo@ejemplo.com" data-i18n-placeholder="rsvp.emailPlaceholder" />
+        <p class="email-error" id="email-error" data-i18n="rsvp.emailDuplicateError">Ese correo ya ha sido registrado como invitado.</p>
+      </div>
+
       <button type="submit" class="submit-btn" data-i18n="rsvp.submit">Enviar confirmación</button>
 
       <div id="form-error" class="form-message error" style="display:none" data-i18n="rsvp.formError">
@@ -483,6 +490,15 @@ import SectionTitle from './SectionTitle.astro';
   }
 
   .intol-personas-wrap { display: none; margin-top: 0.75rem; }
+
+  .email-error {
+    display: none;
+    color: #b44;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.82rem;
+    margin-top: 0.4rem;
+    font-style: normal;
+  }
 
   .intol-personas-list { display: flex; flex-direction: column; gap: 0.5rem; }
 
@@ -1051,6 +1067,10 @@ import SectionTitle from './SectionTitle.astro';
   // ── Form submit ──
   const form = document.getElementById('rsvp-form') as HTMLFormElement;
   const errorMsg   = document.getElementById('form-error')!;
+  const emailInput = document.getElementById('email') as HTMLInputElement;
+  const emailError = document.getElementById('email-error')!;
+
+  emailInput?.addEventListener('input', () => { emailError.style.display = 'none'; });
 
   // Limpia todos los campos, incluido el estado dinámico (acordeones, pickers, campos generados)
   function resetFormCompleto() {
@@ -1063,6 +1083,7 @@ import SectionTitle from './SectionTitle.astro';
     resetIntolerancias();
     document.getElementById('bus-plazas-picker')!.innerHTML = '';
     (document.getElementById('bus_plazas') as HTMLInputElement).value = '';
+    emailError.style.display = 'none';
   }
 
   form?.addEventListener('submit', async (e) => {
@@ -1080,6 +1101,8 @@ import SectionTitle from './SectionTitle.astro';
 
     btn.textContent = t(getCurrentLang(), 'rsvp.sending');
     btn.disabled = true;
+    emailError.style.display = 'none';
+    errorMsg.style.display = 'none';
 
     try {
       const fd = new FormData(form);
@@ -1106,6 +1129,11 @@ import SectionTitle from './SectionTitle.astro';
         btn.textContent = t(getCurrentLang(), 'rsvp.submit');
         btn.disabled = false;
         openSuccessModal();
+      } else if (res.status === 409 || json.code === 'DUPLICATE_EMAIL') {
+        emailError.style.display = 'block';
+        emailError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        btn.textContent = t(getCurrentLang(), 'rsvp.submit');
+        btn.disabled = false;
       } else {
         console.error('RSVP error:', json);
         throw new Error(json.error || 'unknown');
