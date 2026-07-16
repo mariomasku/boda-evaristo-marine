@@ -87,6 +87,30 @@ No hay ninguna librería de i18n en el stack: el sistema multiidioma (§7) es un
 - No existe `output: 'hybrid'` (se eliminó). Solo hace falta añadir el adapter de Vercel.
 - Cualquier fichero en `src/pages/api/*.ts` necesita `export const prerender = false` para ejecutarse como función serverless en vez de prerenderizarse como estático.
 
+**Nota de GSAP / ScrollTrigger — bug de iOS Safari (salto de scroll al top)**:
+- **Síntoma**: en iPhone (Safari), la página "salta" bruscamente hacia arriba al hacer scroll, o al
+  enviar un formulario (cualquier acción que cierre el teclado, ej. el RSVP). No se reproduce en
+  otros navegadores/dispositivos.
+- **Causa**: en iOS, la barra de direcciones y el teclado aparecen/desaparecen cambiando la altura
+  del viewport, lo que dispara eventos `resize`. Por defecto, `ScrollTrigger` reacciona a esos
+  eventos recalculando (`refresh()`) las posiciones de inicio/fin de **todos** los triggers activos
+  (parallax, fades en scroll, etc.), y ese recálculo a mitad de scroll es lo que provoca el salto.
+  Cuantos más triggers `scrub`/`ScrollTrigger.create` haya en la página (parallax de fotos, fades de
+  `.gsap-fade`, timeline...), más notorio es el efecto.
+- **Fix** (aplicarlo desde el primer commit de animaciones, no esperar a que aparezca el bug):
+  justo después de cada `gsap.registerPlugin(ScrollTrigger, ...)`, añadir:
+  ```ts
+  ScrollTrigger.config({ ignoreMobileResize: true });
+  ```
+  Esto hace que ScrollTrigger ignore los `resize` causados solo por el cambio de altura del viewport
+  (barra de direcciones/teclado), sin afectar a los recálculos legítimos por cambios reales de
+  contenido/layout. Repetirlo en cada fichero `.astro` que registre `ScrollTrigger` de forma
+  independiente (es idempotente, no hay problema en llamarlo varias veces).
+- Si el salto persistiera incluso con este fix (caso raro), la siguiente escalada es
+  `ScrollTrigger.normalizeScroll(true)` — más agresivo, unifica el scroll bajo JS y resuelve casi
+  cualquier bug de scroll de iOS, pero cambia el comportamiento nativo del scroll en todo el sitio;
+  probarlo primero en un dispositivo real antes de darlo por bueno.
+
 ---
 
 ## 3. Servicios externos que hay que conectar

@@ -101,6 +101,10 @@ import SectionTitle from './SectionTitle.astro';
 
   gsap.registerPlugin(ScrollTrigger, SplitText);
 
+  // Evita que iOS Safari refresque (y "salte" el scroll) al aparecer/desaparecer
+  // la barra de direcciones o el teclado.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
   document.fonts.ready.then(() => {
     // ── Preparar "el amor." (estado inicial + función de dibujo) ──
     // Se define primero para poder dispararlo al terminar el revelado de texto.

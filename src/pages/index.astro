@@ -111,6 +111,11 @@ import '../styles/global.css';
 
   gsap.registerPlugin(ScrollTrigger);
 
+  // Evita que iOS Safari refresque (y "salte" el scroll) cuando la barra de
+  // direcciones o el teclado aparecen/desaparecen — solo cambia el alto del viewport,
+  // no el contenido, así que no hace falta recalcular los triggers.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
   // Navbar scroll effect
   const navbar = document.getElementById('navbar')!;
   window.addEventListener('scroll', () => {

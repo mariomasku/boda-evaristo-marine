@@ -243,6 +243,10 @@ import SectionTitle from './SectionTitle.astro';
 
   gsap.registerPlugin(ScrollTrigger);
 
+  // Evita que iOS Safari refresque (y "salte" el scroll) al aparecer/desaparecer
+  // la barra de direcciones o el teclado.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
   gsap.utils.toArray<HTMLElement>('.tl-item').forEach((item) => {
     const left  = item.querySelector<HTMLElement>('.tl-left');
     const right = item.querySelector<HTMLElement>('.tl-right');

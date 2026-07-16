@@ -64,6 +64,10 @@ import SectionTitle from './SectionTitle.astro';
 
   gsap.registerPlugin(ScrollTrigger);
 
+  // Evita que iOS Safari refresque (y "salte" el scroll) al aparecer/desaparecer
+  // la barra de direcciones o el teclado.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
   // Tarjeta IDA: entra desde arriba
   gsap.fromTo('.bus-card-ida',
     { opacity: 0, y: 30 },

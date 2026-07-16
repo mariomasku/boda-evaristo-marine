@@ -1129,11 +1129,6 @@ import SectionTitle from './SectionTitle.astro';
         btn.textContent = t(getCurrentLang(), 'rsvp.submit');
         btn.disabled = false;
         openSuccessModal();
-      } else if (res.status === 409 || json.code === 'DUPLICATE_EMAIL') {
-        emailError.style.display = 'block';
-        emailError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        btn.textContent = t(getCurrentLang(), 'rsvp.submit');
-        btn.disabled = false;
       } else {
         console.error('RSVP error:', json);
         throw new Error(json.error || 'unknown');
