@@ -38,6 +38,11 @@ un panel de confirmaciones:
   endpoint, un fichero de configuración) en vez de 15 implementaciones a medida:
   añadir una categoría nueva es añadir una entrada a un array de configuración + sus
   textos de traducción, nada de código nuevo.
+- **Página de Presupuesto** (`/planner/presupuesto`): suma automáticamente los importes
+  ya introducidos en cualquier categoría (cada campo marcado `isCost` en su
+  configuración) y muestra un desglose por categoría + un total general — sin pestaña
+  propia ni datos nuevos que mantener, es una vista de lo que ya se ha ido guardando
+  (ver §7).
 - **No duplica nada que ya exista**: la lista de invitados (ya cubierta por el RSVP) y
   la distribución de mesas (ya es `/mesas`) no se reconstruyen — el menú solo enlaza a
   las páginas que ya existen para esas dos.
@@ -73,6 +78,10 @@ categoría (igual patrón que `ensureSetup()` de `rsvp.ts` y `ensureMesasSchema(
 real** (igual estrategia que `mesas.ts`: estable mientras no se borren filas a mano
 fuera de la app).
 
+Los campos de coste de cada categoría (`tarifa`, `precio_salon`, `coste_total`...) están
+marcados `isCost: true` en `plannerConfig.ts` — es lo que lee la página de Presupuesto
+(§7) para saber qué sumar, sin necesitar una pestaña ni una API propia.
+
 **Aislamiento**: el endpoint `api/planner.ts` es dueño exclusivo de estas 15 pestañas.
 No toca `RSVP`, `RESUMEN` ni `MESAS`, y viceversa — igual criterio que ya se sigue entre
 `rsvp.ts` y `mesas.ts`.
@@ -93,6 +102,7 @@ export interface FieldConfig {
   labelKey: string;      // clave i18n en planner.fieldLabels.<labelKey>
   options?: string[];    // para 'select': claves i18n en planner.options.<valor>
   required?: boolean;
+  isCost?: boolean;      // si suma en /planner/presupuesto (ver §7)
 }
 
 export interface CategoryConfig {
@@ -105,6 +115,8 @@ export interface CategoryConfig {
 
 export const CATEGORIES: CategoryConfig[] = [ /* 15 entradas, ver §2 */ ];
 export function getCategory(id: string): CategoryConfig | undefined { ... }
+export function getCostCategories(): CategoryConfig[] { ... }   // con algún campo isCost
+export function getCostFields(cat: CategoryConfig): FieldConfig[] { ... }
 ```
 
 **Añadir una categoría nueva = añadir una entrada a este array** + sus claves de
@@ -199,7 +211,38 @@ junto al logo) **y el panel off-canvas** (overlay fijo, desliza desde la izquier
 
 ---
 
-## 7. i18n — `src/i18n/translations.admin.ts`
+## 7. Presupuesto — `src/pages/planner/presupuesto.astro`
+
+**No es una categoría más** (no tiene pestaña propia, no usa `planner/[id].astro`): es
+una vista de solo lectura que agrega en el momento los importes ya guardados en las
+demás categorías. Enlace fijo en el menú, junto a "Resumen"/"Distribución de mesas"
+(fuera de los grupos "Organización"/"Proveedores", porque los agrega a ambos).
+
+- **Sin backend nuevo**: en build time, `getCostCategories()` +
+  `getCostFields()` (§3) calculan qué categorías tienen algún campo `isCost` y cuáles
+  son, y se pasan al cliente vía `<script define:vars={{ costCategories }}>`.
+- **Agregación 100% en cliente**: al cargar, hace un `fetch` en paralelo
+  (`Promise.all`) a `/api/planner?cat=<id>` — el mismo endpoint genérico, sin tocarlo —
+  por cada categoría con coste. Por cada fila, suma los valores de sus campos `isCost`
+  (`parseFloat`, tolerando coma decimal) para el subtotal de esa categoría, y todos los
+  subtotales para el total general.
+- **UI**: mismas tarjetas acordeón que el resto del gestor — cabecera con el nombre de
+  la categoría, nº de elementos con coste y su subtotal; el panel interior desglosa
+  cada elemento con el nombre (primer campo) y el detalle de qué campos concretos
+  suman ese importe (p. ej. "Precio del salón: 3.000 € · Coste por persona: 55 €"),
+  más un enlace directo a `/planner/<id>` para editarlo. Formato de moneda con
+  `Intl.NumberFormat` (`es-ES`/`fr-FR`, `EUR`).
+- **Aviso de honestidad, no falsa precisión**: algunos campos son importes **por
+  persona o por ración** (`coste_persona`, `precio_racion`...), no el gasto total de esa
+  partida — el total general los suma tal cual, sin multiplicar por nº de invitados
+  (esa lógica dependería de datos que el gestor no tiene por qué conocer con certeza en
+  cada momento). La página muestra un aviso fijo explicándolo; es el humano quien
+  interpreta esos números al leer el desglose.
+- Recalcula todo también en el listener de `langchange` (igual patrón que el resto).
+
+---
+
+## 8. i18n — `src/i18n/translations.admin.ts`
 
 Todo bajo el diccionario **privado** (nunca lo descarga la web pública — ver el
 requisito previo al principio de este documento). Dos secciones nuevas, en cada idioma:
@@ -221,23 +264,23 @@ falta traducir las claves de campo que sean genuinamente nuevas.
 
 ---
 
-## 8. Cómo replicarlo en una boda nueva
+## 9. Cómo replicarlo en una boda nueva
 
 1. **Comprobar el requisito previo**: el diccionario i18n debe estar ya separado en
    público/privado (ver la nota al principio de este documento). Si no lo está, hacerlo
    primero, en su propio commit.
-2. Copiar `src/lib/plannerConfig.ts` tal cual (o ajustar las 15 categorías si esa boda
-   quiere menos/más — es solo el array de configuración).
+2. Copiar `src/lib/plannerConfig.ts` tal cual (o ajustar las categorías si esa boda
+   quiere menos/más, marcando `isCost: true` en los campos de importe de las nuevas).
 3. Copiar `src/pages/api/planner.ts` tal cual (usa las mismas variables de entorno que
    `rsvp.ts`/`mesas.ts`, no depende de datos de la boda).
-4. Copiar `src/pages/planner/[id].astro` tal cual.
+4. Copiar `src/pages/planner/[id].astro` y `src/pages/planner/presupuesto.astro` tal cual.
 5. Copiar `src/components/AdminNav.astro` tal cual (deriva todo de `plannerConfig.ts`).
 6. Añadir `<AdminNav current="..." />` + `.dash-logo-wrap-group` en la cabecera de
    `dashboard.astro` y `mesas.astro` de esa boda (ver el snippet de §6).
-7. Copiar las secciones `plannerNav` y `planner` de `translations.admin.ts` a todos los
-   idiomas de esa boda.
-8. Nada que preparar a mano en el Google Sheet: las 15 pestañas se crean solas la
-   primera vez que se visita cada categoría.
+7. Copiar las secciones `plannerNav`, `planner` y `presupuesto` de `translations.admin.ts`
+   a todos los idiomas de esa boda.
+8. Nada que preparar a mano en el Google Sheet: las pestañas se crean solas la primera
+   vez que se visita cada categoría; Presupuesto no tiene pestaña propia.
 
 **Dependencias de la plantilla que deben existir**: el motor i18n dividido
 (`i18n/engine.ts` + `i18n/apply.ts` + `i18n/apply.admin.ts`), `LanguageSwitcher.astro`
@@ -246,10 +289,10 @@ boda todavía no lo tiene así), y el patrón de auth por `sessionStorage` del d
 
 ---
 
-## 9. Verificación (cómo probarlo)
+## 10. Verificación (cómo probarlo)
 
-1. `npx astro build` sin errores — comprobar que las 15 rutas `/planner/<id>` aparecen
-   en el listado de "prerendering static routes".
+1. `npx astro build` sin errores — comprobar que las 15 rutas `/planner/<id>` y
+   `/planner/presupuesto` aparecen en el listado de "prerendering static routes".
 2. Local (`npx astro dev --background`) contra el Sheet real de esa boda (no suele
    haber uno de test separado):
    - Visitar cada categoría desde el menú off-canvas y comprobar que resalta la activa.
@@ -257,6 +300,10 @@ boda todavía no lo tiene así), y el patrón de auth por `sessionStorage` del d
      sencilla, p. ej. `tareas`, y una con muchos campos, p. ej. `lugar`), comprobando
      en el Sheet que la pestaña se crea con la cabecera correcta y que las filas
      posteriores se recolocan bien tras un borrado.
+   - Guardar un importe de prueba en 2-3 categorías con campos `isCost`, abrir
+     `/planner/presupuesto` y comprobar que el desglose y el total suman correctamente
+     (se puede replicar la misma suma con un script que llame a `/api/planner?cat=<id>`
+     por cada categoría, para verificar el dato independientemente de la UI).
    - Comprobar que `/api/mesas` y `/api/rsvp` siguen funcionando igual (feature
      aislada, no debería afectarles).
    - Verificar que el chunk público de i18n no ha crecido (`grep` de algún texto del
@@ -265,29 +312,27 @@ boda todavía no lo tiene así), y el patrón de auth por `sessionStorage` del d
 
 ---
 
-## 10. Pendiente (no incluido en esta plantilla)
+## 11. Pendiente (no incluido en esta plantilla)
 
-**"Presupuesto"** e **"Invitaciones"** de la plantilla de Google original no encajan en
-la forma de "lista de tarjetas" de este gestor:
-- *Presupuesto* necesita un total calculado que cruza dos pestañas relacionadas
-  (previsto vs. detallado) — más parecido a `RESUMEN` (fórmulas) que a una lista.
-- *Invitaciones* es más una calculadora de una sola fila (nº de invitaciones × tarjetas
-  × programas con coste unitario) que una lista de registros.
+**"Invitaciones"** de la plantilla de Google original no encaja en la forma de "lista de
+tarjetas" de este gestor ni en la de "agregación" de Presupuesto: es más una
+calculadora de una sola fila (nº de invitaciones × tarjetas × programas con coste
+unitario) que una lista de registros o un sumatorio de otras categorías.
 
-Si se quieren añadir en el futuro, van como páginas a medida (no vía
-`plannerConfig.ts`), reutilizando el mismo menú off-canvas y el mismo diccionario
-`translations.admin.ts`.
+Si se quiere añadir en el futuro, va como página a medida (no vía `plannerConfig.ts`),
+reutilizando el mismo menú off-canvas y el mismo diccionario `translations.admin.ts`.
 
 ---
 
-## 11. Ficheros
+## 12. Ficheros
 
 | Fichero | Cambio |
 |---|---|
-| `src/lib/plannerConfig.ts` | **Nuevo** — configuración de las 15 categorías (fuente de verdad única) |
+| `src/lib/plannerConfig.ts` | **Nuevo** — configuración de las categorías (fuente de verdad única), campos `isCost` |
 | `src/pages/api/planner.ts` | **Nuevo** — endpoint genérico GET/POST para todas las categorías |
 | `src/pages/planner/[id].astro` | **Nuevo** — página dinámica (UI acordeón + script cliente) |
+| `src/pages/planner/presupuesto.astro` | **Nuevo** — vista de agregación de costes (sin pestaña propia) |
 | `src/components/AdminNav.astro` | **Nuevo** — menú hamburguesa off-canvas |
-| `src/i18n/translations.admin.ts` | Secciones `plannerNav` y `planner` (todos los idiomas) |
+| `src/i18n/translations.admin.ts` | Secciones `plannerNav`, `planner` y `presupuesto` (todos los idiomas) |
 | `src/pages/dashboard.astro`, `src/pages/mesas.astro` | Integración de `<AdminNav />` en la cabecera |
 | `api/rsvp.ts`, `api/mesas.ts`, `api/stats.ts` | **Sin cambios** (feature aislada) |

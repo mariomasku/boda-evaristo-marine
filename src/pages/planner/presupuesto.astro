@@ -1,0 +1,349 @@
+---
+export const prerender = true;
+import '../../styles/global.css';
+import LanguageSwitcher from '../../components/LanguageSwitcher.astro';
+import AdminNav from '../../components/AdminNav.astro';
+import { getCostCategories, getCostFields } from '../../lib/plannerConfig';
+
+// Config que necesita el cliente: id/label de categoría + sus campos de coste
+// (key + labelKey). El resto (fetch, sumas, render) es genérico en el script.
+const costCategories = getCostCategories().map((c) => ({
+  id: c.id,
+  label: c.label,
+  costFields: getCostFields(c).map((f) => ({ key: f.key, labelKey: f.labelKey })),
+}));
+---
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presupuesto · Marine & Evaristo José</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Mismo +1pt que el resto del gestor de boda (ver planner/[id].astro). */
+    html { font-size: 17px; }
+
+    :root {
+      --border:      color-mix(in srgb, var(--oro) 28%, transparent);
+      --text-soft:   color-mix(in srgb, var(--sombra) 55%, transparent);
+      --card-shadow: 0 1px 3px color-mix(in srgb, var(--sombra) 6%, transparent), 0 4px 12px color-mix(in srgb, var(--sombra) 4%, transparent);
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--marfil);
+      min-height: 100vh;
+      color: var(--eucalipto);
+    }
+
+    /* ── Header (idéntico al resto del panel) ── */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--eucalipto);
+      border-bottom: 2px solid var(--oro);
+    }
+    .dash-logo-wrap-group { display: flex; align-items: center; gap: 0.85rem; }
+    .dash-logo-wrap { display: flex; flex-direction: column; gap: 2px; }
+    .dash-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-style: italic; color: var(--oro); }
+    .dash-logo-sub {
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--oro) 50%, transparent);
+    }
+    .dash-actions { display: flex; gap: 0.6rem; align-items: center; }
+    .btn-ghost {
+      padding: 0.4rem 0.9rem;
+      border: 1px solid color-mix(in srgb, var(--oro) 35%, transparent);
+      background: transparent;
+      color: color-mix(in srgb, var(--oro) 70%, transparent);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-ghost:hover { background: color-mix(in srgb, var(--oro) 12%, transparent); color: var(--oro); }
+    .btn-back-full { display: inline; }
+    .btn-back-short { display: none; }
+
+    /* ── Main ── */
+    .dash-main { max-width: 780px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    .dash-page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 400; font-style: italic; color: var(--eucalipto); margin-bottom: 0.3rem;
+    }
+    .dash-page-sub {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      margin-bottom: 1.25rem;
+    }
+    #b-loading, #b-error { text-align: center; padding: 3rem; color: var(--text-soft); font-size: 0.9rem; }
+    #b-error { color: #b91c1c; }
+
+    .budget-disclaimer {
+      background: color-mix(in srgb, var(--oro) 10%, transparent);
+      border-left: 3px solid var(--oro);
+      padding: 0.9rem 1.1rem;
+      font-size: 0.82rem;
+      font-style: italic;
+      color: var(--salvia);
+      margin-bottom: 1.5rem;
+    }
+
+    .budget-total-box {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      background: var(--eucalipto);
+      color: var(--marfil);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .budget-total-label {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .budget-total-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem;
+      font-style: italic;
+      color: var(--oro);
+    }
+
+    /* ── Tarjetas acordeón (mismo patrón que el resto del gestor) ── */
+    .planner-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .planner-card {
+      border: 1px solid color-mix(in srgb, var(--oro) 35%, transparent);
+      background: var(--blanco, #fff);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+    .planner-card-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 1rem 1.1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: background 0.2s;
+      min-height: 52px;
+    }
+    .planner-card-btn:active { background: color-mix(in srgb, var(--oro) 10%, transparent); }
+    .planner-card-summary { font-family: 'Playfair Display', serif; font-size: 1.02rem; color: var(--eucalipto); flex: 1; }
+    .planner-card-sub { font-size: 0.72rem; color: var(--text-soft); display: block; margin-top: 2px; }
+    .planner-card-amount { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--oro); font-style: italic; }
+    .planner-chevron { color: color-mix(in srgb, var(--oro) 70%, transparent); font-size: 0.7rem; transition: transform 0.25s ease; flex-shrink: 0; }
+    .planner-card.open .planner-chevron { transform: rotate(180deg); }
+
+    .planner-panel {
+      max-height: 0; overflow: hidden; padding: 0;
+      background: color-mix(in srgb, var(--oro) 4%, transparent);
+      transition: max-height 0.4s ease, padding 0.3s ease;
+    }
+    .planner-card.open .planner-panel {
+      max-height: 1400px;
+      padding: 0.25rem 1.1rem 1.1rem;
+      border-top: 1px solid color-mix(in srgb, var(--oro) 20%, transparent);
+    }
+    .budget-item-row {
+      display: flex; justify-content: space-between; gap: 1rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--oro) 12%, transparent);
+      font-size: 0.85rem;
+    }
+    .budget-item-row:last-of-type { border-bottom: none; }
+    .budget-item-name { color: var(--eucalipto); }
+    .budget-item-detail { color: var(--text-soft); font-size: 0.78rem; }
+    .budget-item-value { color: var(--salvia); font-weight: 700; white-space: nowrap; }
+
+    .planner-card-actions { margin-top: 0.9rem; }
+    .planner-view-link {
+      font-size: 0.78rem;
+      color: var(--oro);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+    .planner-view-link:hover { text-decoration: underline; }
+    .planner-empty { text-align: center; padding: 1rem; color: var(--text-soft); font-size: 0.8rem; font-style: italic; }
+
+    @media (max-width: 640px) {
+      #logout-btn { display: none; }
+      .btn-back-full  { display: none; }
+      .btn-back-short { display: inline; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="dash-header">
+    <div class="dash-logo-wrap-group">
+      <AdminNav current="presupuesto" />
+      <div class="dash-logo-wrap">
+        <span class="dash-logo">Marine <span style="font-style:normal;color:color-mix(in srgb, var(--oro) 50%, transparent)">&</span> Evaristo</span>
+        <span class="dash-logo-sub" data-i18n="plannerNav.presupuesto">Presupuesto</span>
+      </div>
+    </div>
+    <div class="dash-actions">
+      <LanguageSwitcher />
+      <a href="/dashboard" class="btn-ghost">
+        <span class="btn-back-full" data-i18n="planner.backDashboard">← Panel</span>
+        <span class="btn-back-short" data-i18n="planner.backDashboard">← Panel</span>
+      </a>
+      <button class="btn-ghost" id="logout-btn" data-i18n="dashboard.logout">Salir</button>
+    </div>
+  </header>
+
+  <main class="dash-main">
+    <h1 class="dash-page-title" data-i18n="presupuesto.title">Presupuesto</h1>
+    <p class="dash-page-sub" data-i18n="presupuesto.subtitle">Sumatorio de los importes registrados en cada categoría</p>
+    <p class="budget-disclaimer" data-i18n="presupuesto.disclaimer">Algunos importes son por persona o por ración y no están multiplicados por el número de invitados — revisa el detalle de cada categoría antes de tomarlos como coste final.</p>
+
+    <div id="b-loading" data-i18n="presupuesto.loading">Calculando presupuesto…</div>
+    <div id="b-error" style="display:none"></div>
+    <div id="b-content" style="display:none">
+      <div class="budget-total-box">
+        <span class="budget-total-label" data-i18n="presupuesto.total">Total</span>
+        <span class="budget-total-value" id="budget-total">0 €</span>
+      </div>
+      <div class="planner-list" id="budget-list"></div>
+    </div>
+  </main>
+
+  <script define:vars={{ costCategories }}>
+    window.__BUDGET_CATEGORIES__ = costCategories;
+  </script>
+  <script>
+    import { t, getCurrentLang } from '../../i18n/apply.admin';
+
+    // ── Auth guard ──────────────────────────────────────────────
+    if (sessionStorage.getItem('boda_auth') !== 'boda021026') {
+      window.location.replace('/');
+    }
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+      sessionStorage.removeItem('boda_auth');
+      window.location.href = '/';
+    });
+
+    interface CostField { key: string; labelKey: string }
+    interface CostCategory { id: string; label: string; costFields: CostField[] }
+    interface ItemRow { row: number; values: Record<string, string> }
+
+    const categories = (window as any).__BUDGET_CATEGORIES__ as CostCategory[];
+
+    const loadingEl = document.getElementById('b-loading')!;
+    const errorEl   = document.getElementById('b-error')!;
+    const contentEl = document.getElementById('b-content')!;
+    const listEl    = document.getElementById('budget-list')!;
+    const totalEl   = document.getElementById('budget-total')!;
+
+    function fmt(n: number): string {
+      return new Intl.NumberFormat(getCurrentLang() === 'fr' ? 'fr-FR' : 'es-ES', {
+        style: 'currency', currency: 'EUR', maximumFractionDigits: 0,
+      }).format(n);
+    }
+
+    function fieldLabel(labelKey: string): string {
+      return t(getCurrentLang(), `planner.fieldLabels.${labelKey}`);
+    }
+
+    function nameOf(item: ItemRow): string {
+      const firstKey = Object.keys(item.values)[0];
+      return (item.values[firstKey] || '').trim() || '—';
+    }
+
+    async function loadCategory(cat: CostCategory) {
+      const res = await fetch(`/api/planner?cat=${cat.id}`);
+      const json = await res.json().catch(() => ({ ok: false }));
+      const items: ItemRow[] = json.ok ? (json.items ?? []) : [];
+
+      let subtotal = 0;
+      const rows = items.map((item) => {
+        const parts = cat.costFields.map((f) => {
+          const raw = parseFloat((item.values[f.key] || '').replace(',', '.'));
+          const val = isNaN(raw) ? 0 : raw;
+          subtotal += val;
+          return { label: fieldLabel(f.labelKey), value: val };
+        }).filter(p => p.value > 0);
+        return { name: nameOf(item), parts };
+      }).filter(r => r.parts.length > 0);
+
+      return { cat, subtotal, rows, failed: !json.ok };
+    }
+
+    async function load() {
+      try {
+        const results = await Promise.all(categories.map(loadCategory));
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+
+        const grandTotal = results.reduce((s, r) => s + r.subtotal, 0);
+        totalEl.textContent = fmt(grandTotal);
+
+        if (results.some(r => r.failed)) {
+          errorEl.textContent = t(getCurrentLang(), 'presupuesto.loadError');
+          errorEl.style.display = 'block';
+        }
+
+        listEl.innerHTML = results.map((r) => `
+          <div class="planner-card" data-cat="${r.cat.id}">
+            <button type="button" class="planner-card-btn">
+              <span class="planner-card-summary">
+                ${t(getCurrentLang(), `plannerNav.${r.cat.id}`)}
+                <span class="planner-card-sub">${
+                  r.rows.length
+                    ? t(getCurrentLang(), r.rows.length === 1 ? 'presupuesto.itemsOne' : 'presupuesto.itemsOther').replace('{n}', String(r.rows.length))
+                    : t(getCurrentLang(), 'presupuesto.noItems')
+                }</span>
+              </span>
+              <span class="planner-card-amount">${fmt(r.subtotal)}</span>
+              <span class="planner-chevron">▼</span>
+            </button>
+            <div class="planner-panel">
+              ${r.rows.length ? r.rows.map(row => `
+                <div class="budget-item-row">
+                  <div>
+                    <div class="budget-item-name">${row.name}</div>
+                    <div class="budget-item-detail">${row.parts.map(p => `${p.label}: ${fmt(p.value)}`).join(' · ')}</div>
+                  </div>
+                  <div class="budget-item-value">${fmt(row.parts.reduce((s, p) => s + p.value, 0))}</div>
+                </div>
+              `).join('') : `<p class="planner-empty">${t(getCurrentLang(), 'presupuesto.noItems')}</p>`}
+              <div class="planner-card-actions">
+                <a class="planner-view-link" href="/planner/${r.cat.id}" data-i18n="presupuesto.viewCategory">${t(getCurrentLang(), 'presupuesto.viewCategory')}</a>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        listEl.querySelectorAll<HTMLElement>('.planner-card').forEach((card) => {
+          card.querySelector('.planner-card-btn')?.addEventListener('click', () => {
+            const isOpen = card.classList.contains('open');
+            listEl.querySelectorAll('.planner-card').forEach(c => c.classList.remove('open'));
+            if (!isOpen) card.classList.add('open');
+          });
+        });
+      } catch {
+        loadingEl.style.display = 'none';
+        errorEl.textContent = t(getCurrentLang(), 'presupuesto.loadError');
+        errorEl.style.display = 'block';
+      }
+    }
+
+    load();
+    window.addEventListener('langchange', load);
+  </script>
+</body>
+</html>

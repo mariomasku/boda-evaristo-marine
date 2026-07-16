@@ -31,6 +31,7 @@ const PROV = CATEGORIES.filter((c) => c.group === 'proveedores');
     <div class="offcanvas-links">
       <a href="/dashboard" class:list={['offcanvas-link', { active: current === 'dashboard' }]} data-i18n="plannerNav.resumen">Resumen</a>
       <a href="/mesas" class:list={['offcanvas-link', { active: current === 'mesas' }]} data-i18n="plannerNav.mesas">Distribución de mesas</a>
+      <a href="/planner/presupuesto" class:list={['offcanvas-link', { active: current === 'presupuesto' }]} data-i18n="plannerNav.presupuesto">Presupuesto</a>
 
       <div class="offcanvas-group-label" data-i18n="plannerNav.groupOrganizacion">Organización</div>
       {ORG.map((c) => (

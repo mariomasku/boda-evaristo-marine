@@ -347,29 +347,35 @@ Convierte el panel privado en un gestor completo de la boda: un **menú hamburgu
 (enlazado desde la cabecera de `/dashboard`, `/mesas` y todas las páginas nuevas) da acceso a
 **15 categorías de planificación** con UI en acordeón (tareas, coordinación, planificación del día,
 música, regalos, y 10 proveedores: lugar, hotel, vestuario, peluquería, flores, tarta, catering,
-fotógrafo, videógrafo, entretenimiento). Cada categoría es una pestaña nueva del **mismo** Google
-Sheet del RSVP, creada sola la primera vez que se usa. Todas comparten una única plantilla genérica
-(un fichero de configuración + un endpoint + una página dinámica) en vez de 15 implementaciones a
-medida — añadir una categoría nueva es añadir una entrada a un array.
+fotógrafo, videógrafo, entretenimiento) más una **página de Presupuesto** que suma automáticamente
+los importes ya introducidos en cualquier categoría (sin pestaña propia). Cada categoría de
+planificación es una pestaña nueva del **mismo** Google Sheet del RSVP, creada sola la primera vez
+que se usa. Todas comparten una única plantilla genérica (un fichero de configuración + un endpoint
++ una página dinámica) en vez de 15 implementaciones a medida — añadir una categoría nueva es
+añadir una entrada a un array.
 
 **Requisito previo**: el diccionario i18n de esa boda debe estar ya separado en público/privado
 (§7) — si no, el gestor de boda acabaría descargándose también en la web pública de invitados.
 
-**El detalle completo (modelo de datos, config, backend, frontend, menú, i18n, cómo replicarlo y
-cómo probarlo) está en un documento propio:
+**El detalle completo (modelo de datos, config, backend, frontend, menú, presupuesto, i18n, cómo
+replicarlo y cómo probarlo) está en un documento propio:
 [`FUNCIONALIDAD-GESTOR-BODA.md`](./FUNCIONALIDAD-GESTOR-BODA.md).**
 
-Para una boda nueva, replicarlo es copiar 4 ficheros + añadir traducciones:
-1. Copiar `src/lib/plannerConfig.ts` (o ajustar las categorías si esa boda quiere otras).
+Para una boda nueva, replicarlo es copiar 5 ficheros + añadir traducciones:
+1. Copiar `src/lib/plannerConfig.ts` (o ajustar las categorías si esa boda quiere otras, marcando
+   `isCost: true` en los campos de importe).
 2. Copiar `src/pages/api/planner.ts` tal cual (usa las mismas variables de entorno).
-3. Copiar `src/pages/planner/[id].astro` tal cual.
+3. Copiar `src/pages/planner/[id].astro` y `src/pages/planner/presupuesto.astro` tal cual.
 4. Copiar `src/components/AdminNav.astro` tal cual, y añadir `<AdminNav current="..." />` +
    `.dash-logo-wrap-group` en la cabecera de `dashboard.astro`/`mesas.astro`.
-5. Copiar las secciones `plannerNav` y `planner` de `translations.admin.ts` a todos los idiomas.
-6. Nada que preparar en el Sheet: las 15 pestañas se crean solas al primer uso de cada categoría.
+5. Copiar las secciones `plannerNav`, `planner` y `presupuesto` de `translations.admin.ts` a todos
+   los idiomas.
+6. Nada que preparar en el Sheet: las pestañas se crean solas al primer uso de cada categoría;
+   Presupuesto no tiene pestaña propia (agrega las demás en el momento).
 
-**Queda fuera de esta plantilla** (ver el documento propio para el porqué): "Presupuesto" e
-"Invitaciones" de la plantilla de Google original — no encajan en la forma de lista de tarjetas.
+**Queda fuera de esta plantilla** (ver el documento propio para el porqué): "Invitaciones" de la
+plantilla de Google original — es una calculadora de una sola fila, no una lista de tarjetas ni un
+sumatorio de otras categorías.
 
 ---
 
