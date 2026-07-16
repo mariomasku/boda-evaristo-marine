@@ -63,6 +63,10 @@ Una web de invitación de boda de una sola página (landing scroll) con:
   [`FUNCIONALIDAD-EMAIL-RSVP.md`](./FUNCIONALIDAD-EMAIL-RSVP.md))
 - Panel privado (`/dashboard`) con estadísticas en vivo para los novios, protegido con contraseña simple
 - Página privada **`/mesas`** (accesible desde el panel) para organizar el *seating*: asignar invitados a mesas, con mesa nupcial aparte, nombres de mesa, buscador y edición (ver §7bis y [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md))
+- **Gestor de boda** (menú hamburguesa off-canvas desde el panel privado) con 15 categorías de
+  planificación tipo "lista de tarjetas" (tareas, coordinación, planificación del día, música,
+  regalos y 10 proveedores) sobre el mismo Google Sheet (ver §7quater y
+  [`FUNCIONALIDAD-GESTOR-BODA.md`](./FUNCIONALIDAD-GESTOR-BODA.md))
 - Footer con acceso al panel
 - Opcionalmente, **multiidioma con selector de bandera** (ver §7) — hay que decidirlo *antes* de escribir el contenido
 
@@ -170,6 +174,7 @@ Las tipografías se cargan por `@import url(...)` en `src/styles/global.css` des
 - [ ] **Credenciales del panel privado**: cambiar usuarios/contraseña en `Footer.astro` y `dashboard.astro` (ver §6)
 - [ ] **Distribución de mesas (`/mesas`)**: copiar la funcionalidad de seating (ver §7bis y [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md)); solo hay que ajustar el token de auth y el nombre de la pareja
 - [ ] **Email + anti-duplicados en el RSVP**: copiar el campo de email y la comprobación de duplicados (ver §7ter y [`FUNCIONALIDAD-EMAIL-RSVP.md`](./FUNCIONALIDAD-EMAIL-RSVP.md)); decidir primero si esa columna va dentro de `HEADERS` o aparte, según si la boda ya tiene `/mesas`
+- [ ] **Gestor de boda** (menú off-canvas + categorías de planificación): copiar los ficheros de la plantilla genérica (ver §7quater y [`FUNCIONALIDAD-GESTOR-BODA.md`](./FUNCIONALIDAD-GESTOR-BODA.md)); requiere que el diccionario i18n ya esté separado en público/privado (§7)
 - [ ] Probar en local (`npx astro dev --background`), enviar un RSVP de prueba y comprobar que aparece en el Sheet y en `/dashboard`
 - [ ] Deploy: push a `master` (o `npx vercel --prod` si el webhook no dispara)
 
@@ -251,14 +256,18 @@ Si la boda siguiente quiere otra paleta, basta con cambiar los valores hex de es
 
 Sistema de traducción 100% en cliente, sin librería externa (no el i18n de Astro, no `astro-i18next` — simplifica mucho no tener que generar rutas `/es/` y `/fr/` para una landing de una sola página):
 
-- **`src/i18n/translations.ts`** — diccionario plano `{ es: {...}, fr: {...} }`, organizado por sección/componente (`hero.*`, `details.*`, `bus.*`, `rsvp.*`, `footer.*`, `dashboard.*`...). Para una boda nueva: duplicar el bloque de un idioma como base y traducir al resto de idiomas que hagan falta.
-- **`src/i18n/apply.ts`** — motor de aplicación:
+- **`src/i18n/translations.ts`** — diccionario **público**, `{ es: {...}, fr: {...} }`, organizado por sección/componente (`hero.*`, `details.*`, `bus.*`, `rsvp.*`, `footer.*`...) — solo lo que ve un invitado en la web. Para una boda nueva: duplicar el bloque de un idioma como base y traducir al resto de idiomas que hagan falta.
+- **`src/i18n/translations.admin.ts`** — diccionario **privado** (`dashboard.*`, `mesas.*`, y las secciones del gestor de boda si esa boda lo tiene — ver §7quater), con la misma forma `{ es: {...}, fr: {...} }`. Ningún fichero público lo importa.
+- **`src/i18n/engine.ts`** — motor de aplicación compartido, parametrizado por diccionario (`createI18n(dict)`):
   - `detectInitialLang()`: mira `localStorage` primero; si no hay preferencia guardada, usa `navigator.language`.
   - `applyLang(lang)`: recorre el DOM y sustituye texto en `[data-i18n]` (`textContent`), `[data-i18n-html]` (`innerHTML`, para textos con `<strong>`/`<br>` embebido), `[data-i18n-placeholder]`, `[data-i18n-aria]` y `[data-i18n-title]`. Actualiza también `document.title`, la meta description, `document.documentElement.lang`, y guarda la preferencia en `localStorage`.
-  - Dispara un evento `langchange` en `window` para que el contenido generado por JavaScript (ver más abajo) se pueda regenerar en el idioma nuevo sin recargar la página.
+  - Dispara un evento `langchange` en `window` para que el contenido generado por JavaScript (ver más abajo) se pueda regenerar en el idioma nuevo sin recargar la página. También escucha un evento `lang-switch-request` (ver `LanguageSwitcher.astro` más abajo).
   - `t(lang, key)` y `tn(lang, key, n)` (esta última sustituye un marcador `{n}` — útil para "1 persona" / "2 personas").
-  - Se importa **una única vez, lo antes posible**: en el `<head>` de `Layout.astro` para las páginas que usan `Layout`, y al principio del `<script>` de páginas que no lo usan (como `dashboard.astro`, que monta su propio `<html>`). Importa antes de cualquier otro script para que el idioma correcto ya esté aplicado cuando otros scripts (p. ej. GSAP `SplitText`, que trocea el texto en palabras) lean el contenido del DOM.
-- **`src/components/LanguageSwitcher.astro`** — un par de botones-bandera (`🇪🇸`/`🇫🇷`, o los idiomas que toquen) que llaman a `applyLang(lang)` al hacer clic y marcan el activo con `.lang-flag.active`. Se coloca en la navbar de `index.astro` y en el header de `dashboard.astro`.
+- **`src/i18n/apply.ts`** — instancia pública: `createI18n(translations)` (solo el diccionario público) + `initI18n()` al importarse. Es la que importan `Layout.astro` y todos los componentes públicos (Hero, Welcome, Details, Bus, RSVP, Footer...).
+- **`src/i18n/apply.admin.ts`** — instancia privada: fusiona `translations` (público, para `common.*`/título/meta) + `translations.admin` y expone el mismo `t`/`tn`/`getCurrentLang`/`applyLang`. Solo la importan `dashboard.astro`, `mesas.astro` y las páginas del gestor de boda.
+  - Se importa **una única vez, lo antes posible**: en el `<head>` de `Layout.astro` (`apply.ts`) para las páginas que usan `Layout`, y al principio del `<script>` de páginas que no lo usan (como `dashboard.astro`, que monta su propio `<html>` e importa `apply.admin.ts`). Importa antes de cualquier otro script para que el idioma correcto ya esté aplicado cuando otros scripts (p. ej. GSAP `SplitText`, que trocea el texto en palabras) lean el contenido del DOM.
+  - **Por qué está separado en dos diccionarios**: `translations.ts`/`apply.ts` es lo único que llega al bundle de la web pública (vía `Layout.astro`). Si el panel privado (dashboard, mesas, y sobre todo el gestor de boda de §7quater, que puede tener muchas más categorías) compartiera el mismo fichero, todo ese texto viajaría también a cada invitado aunque nunca vea esas pantallas. Mantenerlo separado desde el principio evita tener que hacer luego una migración — hacerlo quirúrgicamente sobre un proyecto ya grande cuesta más que empezar así.
+- **`src/components/LanguageSwitcher.astro`** — un par de botones-bandera (`🇪🇸`/`🇫🇷`, o los idiomas que toquen) que se reutiliza tanto en páginas públicas como privadas. **No importa `apply`/`apply.admin` directamente** (si lo hiciera, siempre resolvería el mismo diccionario sin importar dónde se usa): al pulsar una bandera dispara `window.dispatchEvent(new CustomEvent('lang-switch-request', { detail: { lang } }))`, y es la instancia de i18n cargada en cada página (`apply.ts` o `apply.admin.ts`, cada una con su propio listener registrado en `initI18n()`) la que responde y aplica el cambio con su propio diccionario. Se coloca en la navbar de `index.astro`, en el header de `dashboard.astro`/`mesas.astro`, y en las páginas del gestor de boda.
 
 ### Qué hay que traducir, en la práctica
 
@@ -276,9 +285,9 @@ Sistema de traducción 100% en cliente, sin librería externa (no el i18n de Ast
 
 ### Checklist rápida al construir la web multiidioma desde el principio
 
-- [ ] Crear `src/i18n/translations.ts` y `src/i18n/apply.ts` calcados de los de boda-evaristo-marine
-- [ ] Crear `src/components/LanguageSwitcher.astro` y añadirlo a la navbar y al header del dashboard
-- [ ] Importar `../i18n/apply` en `Layout.astro` (cuanto antes en el `<head>`) y en el `<script>` de `dashboard.astro`
+- [ ] Crear `src/i18n/engine.ts`, `src/i18n/translations.ts` (público), `src/i18n/apply.ts` (público), `src/i18n/translations.admin.ts` (privado) y `src/i18n/apply.admin.ts` (privado) calcados de los de boda-evaristo-marine
+- [ ] Crear `src/components/LanguageSwitcher.astro` (versión desacoplada por evento `lang-switch-request`, no por import directo) y añadirlo a la navbar y al header del dashboard/mesas
+- [ ] Importar `../i18n/apply` en `Layout.astro` (cuanto antes en el `<head>`) y `../i18n/apply.admin` en el `<script>` de `dashboard.astro`/`mesas.astro`
 - [ ] Ir componente a componente añadiendo `data-i18n`/`data-i18n-html`/`data-i18n-placeholder`/`data-i18n-aria`/`data-i18n-title` según el tipo de contenido
 - [ ] Revisar cada `<script>` que genere HTML dinámicamente (RSVP, Details/ICS, dashboard) y usar `t()`/`tn()` en vez de strings fijos, con su listener de `langchange` para refrescar lo ya renderizado
 - [ ] Añadir una `key` estable en `api/stats.ts` para cualquier lista que muestre nombres traducibles (alérgenos, bebidas...)
@@ -332,6 +341,38 @@ añadirse directamente al array `HEADERS` de `rsvp.ts`, más simple.
 
 ---
 
+## 7quater. Gestor de boda (menú off-canvas + categorías de planificación)
+
+Convierte el panel privado en un gestor completo de la boda: un **menú hamburguesa off-canvas**
+(enlazado desde la cabecera de `/dashboard`, `/mesas` y todas las páginas nuevas) da acceso a
+**15 categorías de planificación** con UI en acordeón (tareas, coordinación, planificación del día,
+música, regalos, y 10 proveedores: lugar, hotel, vestuario, peluquería, flores, tarta, catering,
+fotógrafo, videógrafo, entretenimiento). Cada categoría es una pestaña nueva del **mismo** Google
+Sheet del RSVP, creada sola la primera vez que se usa. Todas comparten una única plantilla genérica
+(un fichero de configuración + un endpoint + una página dinámica) en vez de 15 implementaciones a
+medida — añadir una categoría nueva es añadir una entrada a un array.
+
+**Requisito previo**: el diccionario i18n de esa boda debe estar ya separado en público/privado
+(§7) — si no, el gestor de boda acabaría descargándose también en la web pública de invitados.
+
+**El detalle completo (modelo de datos, config, backend, frontend, menú, i18n, cómo replicarlo y
+cómo probarlo) está en un documento propio:
+[`FUNCIONALIDAD-GESTOR-BODA.md`](./FUNCIONALIDAD-GESTOR-BODA.md).**
+
+Para una boda nueva, replicarlo es copiar 4 ficheros + añadir traducciones:
+1. Copiar `src/lib/plannerConfig.ts` (o ajustar las categorías si esa boda quiere otras).
+2. Copiar `src/pages/api/planner.ts` tal cual (usa las mismas variables de entorno).
+3. Copiar `src/pages/planner/[id].astro` tal cual.
+4. Copiar `src/components/AdminNav.astro` tal cual, y añadir `<AdminNav current="..." />` +
+   `.dash-logo-wrap-group` en la cabecera de `dashboard.astro`/`mesas.astro`.
+5. Copiar las secciones `plannerNav` y `planner` de `translations.admin.ts` a todos los idiomas.
+6. Nada que preparar en el Sheet: las 15 pestañas se crean solas al primer uso de cada categoría.
+
+**Queda fuera de esta plantilla** (ver el documento propio para el porqué): "Presupuesto" e
+"Invitaciones" de la plantilla de Google original — no encajan en la forma de lista de tarjetas.
+
+---
+
 ## 8. Cómo funciona la integración con Google Sheets (resumen técnico)
 
 ### `src/pages/api/rsvp.ts` (POST, escritura)
@@ -360,6 +401,11 @@ añadirse directamente al array `HEADERS` de `rsvp.ts`, más simple.
 ### `src/pages/api/mesas.ts` (GET/POST, usado por `/mesas`)
 - Gestiona **aparte** la funcionalidad de seating (§7bis): la columna `MESA` de la pestaña `RSVP` y la
   pestaña `MESAS`. `rsvp.ts` y `stats.ts` no la conocen ni la tocan. Detalle en [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md).
+
+### `src/pages/api/planner.ts` (GET/POST, usado por `/planner/[id]`)
+- Un único endpoint genérico para las 15 categorías del gestor de boda (§7quater): cada categoría es
+  una pestaña propia, creada de forma perezosa e idempotente a partir de `src/lib/plannerConfig.ts`.
+  No toca `RSVP`, `RESUMEN` ni `MESAS`. Detalle en [`FUNCIONALIDAD-GESTOR-BODA.md`](./FUNCIONALIDAD-GESTOR-BODA.md).
 
 ---
 
@@ -404,3 +450,4 @@ npx vercel logs <deployment-url> --since 1h
 - Instrucciones de desarrollo del repo: [`CLAUDE.md`](./CLAUDE.md)
 - Funcionalidad de mesas (seating): [`FUNCIONALIDAD-MESAS.md`](./FUNCIONALIDAD-MESAS.md)
 - Funcionalidad de email + anti-duplicados del RSVP: [`FUNCIONALIDAD-EMAIL-RSVP.md`](./FUNCIONALIDAD-EMAIL-RSVP.md)
+- Gestor de boda (menú off-canvas + categorías de planificación): [`FUNCIONALIDAD-GESTOR-BODA.md`](./FUNCIONALIDAD-GESTOR-BODA.md)
