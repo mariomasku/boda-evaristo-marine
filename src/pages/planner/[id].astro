@@ -1,0 +1,483 @@
+---
+export const prerender = true;
+import '../../styles/global.css';
+import LanguageSwitcher from '../../components/LanguageSwitcher.astro';
+import AdminNav from '../../components/AdminNav.astro';
+import { CATEGORIES, getCategory } from '../../lib/plannerConfig';
+
+export function getStaticPaths() {
+  return CATEGORIES.map((c) => ({ params: { id: c.id } }));
+}
+
+const { id } = Astro.params;
+const cat = getCategory(id as string)!;
+---
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{cat.label} · Marine & Evaristo José</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* El gestor de boda muestra más texto/tablas que el resto del panel: +1pt de
+       tamaño base (16px → 17px) para que todo se lea con más comodidad. Escala
+       todas las medidas en rem del resto de esta página proporcionalmente. */
+    html { font-size: 17px; }
+
+    :root {
+      --border:      color-mix(in srgb, var(--oro) 28%, transparent);
+      --text-soft:   color-mix(in srgb, var(--sombra) 55%, transparent);
+      --card-shadow: 0 1px 3px color-mix(in srgb, var(--sombra) 6%, transparent), 0 4px 12px color-mix(in srgb, var(--sombra) 4%, transparent);
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--marfil);
+      min-height: 100vh;
+      color: var(--eucalipto);
+    }
+
+    /* ── Header (idéntico al dashboard/mesas) ── */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--eucalipto);
+      border-bottom: 2px solid var(--oro);
+    }
+    .dash-logo-wrap-group { display: flex; align-items: center; gap: 0.85rem; }
+    .dash-logo-wrap { display: flex; flex-direction: column; gap: 2px; }
+    .dash-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-style: italic; color: var(--oro); }
+    .dash-logo-sub {
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: color-mix(in srgb, var(--oro) 50%, transparent);
+    }
+    .dash-actions { display: flex; gap: 0.6rem; align-items: center; }
+    .btn-ghost {
+      padding: 0.4rem 0.9rem;
+      border: 1px solid color-mix(in srgb, var(--oro) 35%, transparent);
+      background: transparent;
+      color: color-mix(in srgb, var(--oro) 70%, transparent);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-ghost:hover { background: color-mix(in srgb, var(--oro) 12%, transparent); color: var(--oro); }
+    .btn-back-full { display: inline; }
+    .btn-back-short { display: none; }
+
+    /* ── Main ── */
+    .dash-main { max-width: 780px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    .dash-page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 400; font-style: italic; color: var(--eucalipto); margin-bottom: 1.25rem;
+    }
+    #p-loading, #p-error { text-align: center; padding: 3rem; color: var(--text-soft); font-size: 0.9rem; }
+    #p-error { color: #b91c1c; }
+
+    /* ── Botón añadir ── */
+    .planner-add-btn {
+      align-self: flex-start;
+      padding: 0.7rem 1.4rem;
+      background: var(--eucalipto);
+      color: var(--marfil);
+      border: none;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 1.25rem;
+    }
+    .planner-add-btn:hover { background: var(--salvia); }
+
+    /* ── Tarjetas acordeón (mismo patrón que RSVP/mesas) ── */
+    .planner-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .planner-empty { text-align: center; padding: 2rem; color: var(--text-soft); font-size: 0.85rem; font-style: italic; }
+
+    .planner-card {
+      border: 1px solid color-mix(in srgb, var(--oro) 35%, transparent);
+      background: var(--blanco, #fff);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+    .planner-card-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 1rem 1.1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: background 0.2s;
+      min-height: 52px;
+    }
+    .planner-card-btn:active { background: color-mix(in srgb, var(--oro) 10%, transparent); }
+    .planner-card-summary {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.02rem;
+      color: var(--eucalipto);
+      flex: 1;
+    }
+    .planner-card-summary.placeholder { color: var(--text-soft); font-style: italic; }
+    .planner-chevron {
+      color: color-mix(in srgb, var(--oro) 70%, transparent);
+      font-size: 0.7rem;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+    }
+    .planner-card.open .planner-chevron { transform: rotate(180deg); }
+
+    .planner-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-height: 0;
+      overflow: hidden;
+      padding: 0;
+      background: color-mix(in srgb, var(--oro) 4%, transparent);
+      transition: max-height 0.4s ease, padding 0.3s ease;
+    }
+    .planner-card.open .planner-panel {
+      max-height: 1400px;
+      padding: 0.25rem 1.1rem 1.1rem;
+      border-top: 1px solid color-mix(in srgb, var(--oro) 20%, transparent);
+    }
+
+    .planner-field { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.9rem; }
+    .planner-field-label {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--salvia);
+    }
+    .planner-field input,
+    .planner-field select,
+    .planner-field textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.75rem 0.9rem;
+      background: var(--marfil);
+      border: 1.5px solid color-mix(in srgb, var(--oro) 45%, transparent);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      color: var(--eucalipto);
+      outline: none;
+      appearance: none;
+    }
+    .planner-field input:focus,
+    .planner-field select:focus,
+    .planner-field textarea:focus { border-color: var(--oro); }
+    .planner-field textarea { resize: vertical; min-height: 4.5rem; }
+
+    .planner-card-error {
+      display: none;
+      color: #b44;
+      font-size: 0.78rem;
+      margin-top: 0.6rem;
+    }
+    .planner-card-error.visible { display: block; }
+
+    .planner-card-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1.1rem;
+    }
+    .planner-btn {
+      padding: 0.6rem 1.2rem;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: opacity 0.2s;
+    }
+    .planner-btn:disabled { opacity: 0.6; cursor: default; }
+    .planner-btn-save { background: var(--eucalipto); color: var(--marfil); }
+    .planner-btn-save:hover:not(:disabled) { background: var(--salvia); }
+    .planner-btn-delete {
+      background: transparent;
+      color: #b44;
+      border-color: color-mix(in srgb, #b44 40%, transparent);
+    }
+    .planner-btn-delete:hover { background: color-mix(in srgb, #b44 8%, transparent); }
+
+    @media (max-width: 640px) {
+      #logout-btn { display: none; }
+      .btn-back-full  { display: none; }
+      .btn-back-short { display: inline; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="dash-header">
+    <div class="dash-logo-wrap-group">
+      <AdminNav current={cat.id} />
+      <div class="dash-logo-wrap">
+        <span class="dash-logo">Marine <span style="font-style:normal;color:color-mix(in srgb, var(--oro) 50%, transparent)">&</span> Evaristo</span>
+        <span class="dash-logo-sub" data-i18n={`plannerNav.${cat.id}`}>{cat.label}</span>
+      </div>
+    </div>
+    <div class="dash-actions">
+      <LanguageSwitcher />
+      <a href="/dashboard" class="btn-ghost">
+        <span class="btn-back-full" data-i18n="planner.backDashboard">← Panel</span>
+        <span class="btn-back-short" data-i18n="planner.backDashboard">← Panel</span>
+      </a>
+      <button class="btn-ghost" id="logout-btn" data-i18n="dashboard.logout">Salir</button>
+    </div>
+  </header>
+
+  <main class="dash-main">
+    <h1 class="dash-page-title" data-i18n={`plannerNav.${cat.id}`}>{cat.label}</h1>
+
+    <div id="p-loading" data-i18n="planner.loading">Cargando…</div>
+    <div id="p-error" style="display:none"></div>
+    <div id="p-content" style="display:none">
+      <button type="button" class="planner-add-btn" id="planner-add" data-i18n="planner.add">+ Añadir</button>
+      <div class="planner-list" id="planner-list"></div>
+    </div>
+  </main>
+
+  <script define:vars={{ catId: cat.id, fields: cat.fields }}>
+    // Los valores anteriores (catId, fields) los inyecta Astro en build time — el
+    // resto de la lógica (fetch, render, acordeón) es genérica para las 15 categorías.
+    window.__PLANNER_CAT__ = catId;
+    window.__PLANNER_FIELDS__ = fields;
+  </script>
+  <script>
+    import { t, tn, getCurrentLang } from '../../i18n/apply.admin';
+
+    // ── Auth guard ──────────────────────────────────────────────
+    if (sessionStorage.getItem('boda_auth') !== 'boda021026') {
+      window.location.replace('/');
+    }
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+      sessionStorage.removeItem('boda_auth');
+      window.location.href = '/';
+    });
+
+    type FieldType = 'text' | 'tel' | 'email' | 'url' | 'number' | 'textarea' | 'select';
+    interface FieldConfig { key: string; type: FieldType; labelKey: string; options?: string[]; required?: boolean }
+    interface Item { row: number | null; values: Record<string, string> }
+
+    const catId  = (window as any).__PLANNER_CAT__ as string;
+    const fields = (window as any).__PLANNER_FIELDS__ as FieldConfig[];
+
+    const loadingEl = document.getElementById('p-loading')!;
+    const errorEl   = document.getElementById('p-error')!;
+    const contentEl = document.getElementById('p-content')!;
+    const listEl    = document.getElementById('planner-list')!;
+    const addBtn    = document.getElementById('planner-add') as HTMLButtonElement;
+
+    let items: Item[] = [];
+    let tempId = 0;
+
+    function fieldLabel(f: FieldConfig): string {
+      return t(getCurrentLang(), `planner.fieldLabels.${f.labelKey}`);
+    }
+    function optionLabel(opt: string): string {
+      return t(getCurrentLang(), `planner.options.${opt}`);
+    }
+
+    function summaryFor(values: Record<string, string>): string {
+      const first = fields[0];
+      const v = (values[first.key] || '').trim();
+      return v || t(getCurrentLang(), 'planner.empty').split('.')[0];
+    }
+
+    function inputHtml(f: FieldConfig, value: string, uid: string): string {
+      const id = `f-${uid}-${f.key}`;
+      if (f.type === 'textarea') {
+        return `<textarea id="${id}" data-key="${f.key}">${value ?? ''}</textarea>`;
+      }
+      if (f.type === 'select') {
+        const opts = ['<option value="">—</option>']
+          .concat((f.options ?? []).map(o => `<option value="${o}" ${o === value ? 'selected' : ''}>${optionLabel(o)}</option>`));
+        return `<select id="${id}" data-key="${f.key}">${opts.join('')}</select>`;
+      }
+      const inputType = f.type === 'number' ? 'number' : f.type;
+      return `<input type="${inputType}" id="${id}" data-key="${f.key}" value="${(value ?? '').replace(/"/g, '&quot;')}" />`;
+    }
+
+    function cardHtml(item: Item, uid: string): string {
+      const lang = getCurrentLang();
+      return `
+        <div class="planner-card" data-uid="${uid}" data-row="${item.row ?? ''}">
+          <button type="button" class="planner-card-btn">
+            <span class="planner-card-summary ${summaryFor(item.values) === t(lang, 'planner.empty').split('.')[0] ? 'placeholder' : ''}">${summaryFor(item.values)}</span>
+            <span class="planner-chevron">▼</span>
+          </button>
+          <div class="planner-panel">
+            ${fields.map(f => `
+              <div class="planner-field">
+                <label class="planner-field-label" for="f-${uid}-${f.key}">${fieldLabel(f)}${f.required ? ' *' : ''}</label>
+                ${inputHtml(f, item.values[f.key] ?? '', uid)}
+              </div>
+            `).join('')}
+            <p class="planner-card-error"></p>
+            <div class="planner-card-actions">
+              <button type="button" class="planner-btn planner-btn-save">${t(lang, 'planner.save')}</button>
+              <button type="button" class="planner-btn planner-btn-delete">${t(lang, 'planner.delete')}</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      if (!items.length) {
+        listEl.innerHTML = `<p class="planner-empty">${t(getCurrentLang(), 'planner.empty')}</p>`;
+        return;
+      }
+      listEl.innerHTML = items.map((item, i) => cardHtml(item, String(item.row ?? `new-${i}`))).join('');
+      wireCards();
+    }
+
+    function wireCards() {
+      listEl.querySelectorAll<HTMLElement>('.planner-card').forEach((card) => {
+        const btn = card.querySelector<HTMLButtonElement>('.planner-card-btn')!;
+        btn.addEventListener('click', () => {
+          const isOpen = card.classList.contains('open');
+          listEl.querySelectorAll('.planner-card').forEach(c => c.classList.remove('open'));
+          if (!isOpen) card.classList.add('open');
+        });
+
+        card.querySelector('.planner-btn-save')?.addEventListener('click', () => saveCard(card));
+        card.querySelector('.planner-btn-delete')?.addEventListener('click', () => deleteCard(card));
+      });
+    }
+
+    function readValues(card: HTMLElement): Record<string, string> {
+      const values: Record<string, string> = {};
+      fields.forEach((f) => {
+        const el = card.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(`[data-key="${f.key}"]`);
+        values[f.key] = el?.value ?? '';
+      });
+      return values;
+    }
+
+    async function saveCard(card: HTMLElement) {
+      const errEl = card.querySelector<HTMLElement>('.planner-card-error')!;
+      errEl.classList.remove('visible');
+
+      const values = readValues(card);
+      const missing = fields.filter(f => f.required && !values[f.key]?.trim());
+      if (missing.length) {
+        errEl.textContent = `${fieldLabel(missing[0])}: ${t(getCurrentLang(), 'planner.saveError')}`;
+        errEl.classList.add('visible');
+        return;
+      }
+
+      const saveBtn = card.querySelector<HTMLButtonElement>('.planner-btn-save')!;
+      saveBtn.disabled = true;
+      saveBtn.textContent = t(getCurrentLang(), 'planner.saving');
+
+      const rowAttr = card.dataset.row;
+      const row = rowAttr ? parseInt(rowAttr) : NaN;
+
+      try {
+        const res = await fetch('/api/planner', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cat: catId, action: 'save', row: Number.isInteger(row) ? row : undefined, values }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.ok) throw new Error(json.error || 'unknown');
+
+        const uid = card.dataset.uid!;
+        const idx = items.findIndex((it, i) => String(it.row ?? `new-${i}`) === uid);
+        if (idx >= 0) {
+          items[idx] = { row: json.row ?? items[idx].row, values };
+        }
+        card.dataset.row = String(json.row ?? '');
+        render();
+      } catch (err) {
+        errEl.textContent = t(getCurrentLang(), 'planner.saveError');
+        errEl.classList.add('visible');
+        saveBtn.disabled = false;
+        saveBtn.textContent = t(getCurrentLang(), 'planner.save');
+      }
+    }
+
+    async function deleteCard(card: HTMLElement) {
+      const rowAttr = card.dataset.row;
+      const row = rowAttr ? parseInt(rowAttr) : NaN;
+
+      // Fila aún no guardada: quitarla del DOM sin llamar a la API.
+      if (!Number.isInteger(row)) {
+        const uid = card.dataset.uid!;
+        items = items.filter((it, i) => String(it.row ?? `new-${i}`) !== uid);
+        render();
+        return;
+      }
+
+      if (!confirm(t(getCurrentLang(), 'planner.deleteConfirm'))) return;
+
+      const delBtn = card.querySelector<HTMLButtonElement>('.planner-btn-delete')!;
+      delBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/planner', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cat: catId, action: 'delete', row }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.ok) throw new Error(json.error || 'unknown');
+
+        items = items.filter(it => it.row !== row);
+        // Las filas posteriores se desplazan una posición hacia arriba en el Sheet.
+        items = items.map(it => (it.row && it.row > row) ? { ...it, row: it.row - 1 } : it);
+        render();
+      } catch {
+        delBtn.disabled = false;
+      }
+    }
+
+    addBtn.addEventListener('click', () => {
+      items.push({ row: null, values: {} });
+      render();
+      const lastCard = listEl.querySelector<HTMLElement>('.planner-card:last-child');
+      lastCard?.classList.add('open');
+      lastCard?.querySelector<HTMLElement>('input, select, textarea')?.focus();
+      lastCard?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    async function load() {
+      try {
+        const res = await fetch(`/api/planner?cat=${catId}`);
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json.ok) throw new Error(json.error || 'unknown');
+        items = json.items ?? [];
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+        render();
+      } catch (err) {
+        loadingEl.style.display = 'none';
+        errorEl.textContent = t(getCurrentLang(), 'planner.loadError');
+        errorEl.style.display = 'block';
+      }
+    }
+
+    load();
+
+    window.addEventListener('langchange', () => { if (items.length || !loadingEl.style.display) render(); });
+  </script>
+</body>
+</html>

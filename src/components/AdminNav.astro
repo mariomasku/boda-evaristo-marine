@@ -1,0 +1,159 @@
+---
+// Menú off-canvas del gestor de boda: se incluye en dashboard.astro, mesas.astro y
+// todas las páginas de /planner/*. `current` resalta el enlace activo.
+import { CATEGORIES } from '../lib/plannerConfig';
+
+interface Props {
+  current?: string;
+}
+const { current = '' } = Astro.props;
+
+const ORG = CATEGORIES.filter((c) => c.group === 'organizacion');
+const PROV = CATEGORIES.filter((c) => c.group === 'proveedores');
+---
+<button type="button" class="hamburger-btn" id="admin-nav-toggle" aria-label="Abrir menú" data-i18n-aria="plannerNav.menuAria">
+  <svg width="20" height="16" viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+    <line x1="0" y1="1" x2="20" y2="1"/>
+    <line x1="0" y1="8" x2="20" y2="8"/>
+    <line x1="0" y1="15" x2="20" y2="15"/>
+  </svg>
+</button>
+
+<div class="offcanvas-overlay" id="admin-nav-overlay">
+  <nav class="offcanvas-panel" id="admin-nav-panel" aria-label="Menú del gestor de boda">
+    <div class="offcanvas-header">
+      <span class="offcanvas-logo">Marine <span style="font-style:normal;color:color-mix(in srgb, var(--oro) 50%, transparent)">&</span> Evaristo</span>
+      <button type="button" class="offcanvas-close" id="admin-nav-close" aria-label="Cerrar menú" data-i18n-aria="plannerNav.closeAria">
+        <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
+      </button>
+    </div>
+
+    <div class="offcanvas-links">
+      <a href="/dashboard" class:list={['offcanvas-link', { active: current === 'dashboard' }]} data-i18n="plannerNav.resumen">Resumen</a>
+      <a href="/mesas" class:list={['offcanvas-link', { active: current === 'mesas' }]} data-i18n="plannerNav.mesas">Distribución de mesas</a>
+
+      <div class="offcanvas-group-label" data-i18n="plannerNav.groupOrganizacion">Organización</div>
+      {ORG.map((c) => (
+        <a href={`/planner/${c.id}`} class:list={['offcanvas-link', { active: current === c.id }]} data-i18n={`plannerNav.${c.id}`}>{c.label}</a>
+      ))}
+
+      <div class="offcanvas-group-label" data-i18n="plannerNav.groupProveedores">Proveedores</div>
+      {PROV.map((c) => (
+        <a href={`/planner/${c.id}`} class:list={['offcanvas-link', { active: current === c.id }]} data-i18n={`plannerNav.${c.id}`}>{c.label}</a>
+      ))}
+    </div>
+  </nav>
+</div>
+
+<style>
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem;
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--oro) 35%, transparent);
+    color: color-mix(in srgb, var(--oro) 80%, transparent);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .hamburger-btn:hover { background: color-mix(in srgb, var(--oro) 12%, transparent); color: var(--oro); }
+
+  .offcanvas-overlay {
+    position: fixed;
+    inset: 0;
+    background: color-mix(in srgb, var(--eucalipto-noche, #16211f) 78%, transparent);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .offcanvas-overlay.open { opacity: 1; pointer-events: auto; }
+
+  .offcanvas-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(300px, 82vw);
+    background: var(--marfil);
+    box-shadow: 4px 0 24px color-mix(in srgb, var(--sombra) 30%, transparent);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+  }
+  .offcanvas-overlay.open .offcanvas-panel { transform: translateX(0); }
+
+  .offcanvas-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.25rem;
+    border-bottom: 2px solid var(--oro);
+    background: var(--eucalipto);
+  }
+  .offcanvas-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--oro);
+  }
+  .offcanvas-close {
+    background: transparent;
+    border: none;
+    color: color-mix(in srgb, var(--oro) 70%, transparent);
+    cursor: pointer;
+    padding: 0.3rem;
+    display: flex;
+  }
+  .offcanvas-close:hover { color: var(--oro); }
+
+  .offcanvas-links {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 0 1.5rem;
+  }
+
+  .offcanvas-group-label {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--oro) 75%, transparent);
+    padding: 1.1rem 1.25rem 0.4rem;
+  }
+
+  .offcanvas-link {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.92rem;
+    color: var(--eucalipto);
+    text-decoration: none;
+    padding: 0.65rem 1.25rem;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .offcanvas-link:hover { background: color-mix(in srgb, var(--oro) 8%, transparent); }
+  .offcanvas-link.active {
+    border-left-color: var(--oro);
+    background: color-mix(in srgb, var(--oro) 12%, transparent);
+    font-weight: 700;
+  }
+</style>
+
+<script>
+  const toggle  = document.getElementById('admin-nav-toggle')!;
+  const overlay = document.getElementById('admin-nav-overlay')!;
+  const closeBtn = document.getElementById('admin-nav-close')!;
+
+  const open  = () => overlay.classList.add('open');
+  const close = () => overlay.classList.remove('open');
+
+  toggle.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+</script>
